@@ -1,8 +1,9 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
-(ns ClojureProjekt.lit_view
+(ns ClojureProject.lit_view
   (:require [seesaw.core :refer :all]
             [seesaw.dev :refer :all]
-            [ClojureProjekt.lit_control :as control]))
+            [ClojureProject.lit_i18n :as i18n]
+            [ClojureProject.lit_control :as control]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DECLARETION
@@ -88,11 +89,27 @@
   (config! field_add_autor :text "")
   (config! field_add_verlag :text ""))
 
+(defn executeSearch []
+  (control/executeSearchTitle [(config! field_smd_titel :text)
+                               (config! field_smd_autor :text)
+                               (config! field_smd_verlag :text)]))
+
+(defn executeAdd []
+  (control/executeAddTitle [(config! field_add_titel :text)
+                            (config! field_add_autor :text)
+                            (config! field_add_verlag :text)]))
+
+(defn saveConfiguration []
+  (control/saveConfiguration [(config! field_database_host :text)
+                              (config! field_database_name :text)
+                              (config! field_database_username :text)
+                              (config! field_database_password :text)]))
+
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
 
 (def button_database_save_action (action
-                                   :handler (fn [e] (control/saveConfiguration))
+                                   :handler (fn [e] (saveConfiguration))
                                    :name text_database_button_save))
 
 (def button_smd_clear_action (action
@@ -100,7 +117,7 @@
                                    :name text_smd_button_clear))
 
 (def button_smd_search_action (action
-                                   :handler (fn [e] (control/executeSearch))
+                                   :handler (fn [e] (executeSearch))
                                    :name text_smd_button_search))
 
 (def button_add_clear_action (action
@@ -108,7 +125,7 @@
                                    :name text_add_button_clear))
 
 (def button_add_save_action (action
-                                   :handler (fn [e] (control/executeAdd))
+                                   :handler (fn [e] (executeAdd))
                                    :name text_add_button_save))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -223,7 +240,7 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MAIN FRAME
 
-(def frame_main (frame :title text_frame_main_title
+(def frame_main (frame :title (i18n/i18n :text_frame_main_title)
                        :size [640 :by 480]
                        :menubar frame_menu
                        :content smd_panel))

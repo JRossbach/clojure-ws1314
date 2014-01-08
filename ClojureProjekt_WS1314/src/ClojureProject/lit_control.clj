@@ -1,32 +1,32 @@
 ; -------------------------------------------------------------------------------------
 (ns ClojureProject.lit_control
-  (:require [ClojureProjekt.lit_data :as data]))
+  (:require [ClojureProject.lit_data :as data]))
 
 ; -------------------------------------------------------------------------------------
 
 (defn saveConfiguration [saveVec]  
-  (println saveVec))
+  (println "test"))
 
 (defn executeSearchTitle [searchVec]
-  (println searchVec))
+  (println "test"))
 
 (defn executeSearchPublisher [searchVec]
-  (println searchVec))
+  (println "test"))
 
 (defn executeModifyTitle [title]
-  (println title))
+  (println "test"))
 
 (defn executeModifyPublisher [publisher]
-  (println title))
+  (println "test"))
 
 (defn executeAddTitle [title]
-  (println title))
+  (println "test"))
 
 (defn executeAddPublisher [publisher]
-  (println publisher))
+  (println "test"))
 
 (defn executeDeleteTitle [title]
-  (println title))
+  (println "test"))
 
 (defn executeDeletePublisher [publisher]
-  (println publisher))
+  (println "test"))
