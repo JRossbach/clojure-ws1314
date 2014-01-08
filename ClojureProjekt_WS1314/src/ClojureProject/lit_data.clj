@@ -1,11 +1,15 @@
 (ns ClojureProject.lit_data)
 
+(use 'korma.db)
+(require '[clojure.string :as str])
 
 (declare title publisher)
 
 
 (defn connectDB [[db host user pass]]
-  (defdb mySQL (mysql {:db db :host host :user user :password pass})))
+  (def mySQL (mysql {:db db :host host :user user :password pass}))
+  (defdb main mySQL)
+ )
 
 
 (defn disconnect)
