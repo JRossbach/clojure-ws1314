@@ -3,30 +3,48 @@
   (:require [ClojureProject.lit_data :as data]))
 
 ; -------------------------------------------------------------------------------------
+; DATABASE OPERATIONS
 
 (defn saveConfiguration [saveVec]  
-  (println "test"))
+  (println saveVec))
+
+(defn connectDatabase []  
+  (println "connect database"))
+
+(defn disconnectDatabase []  
+  (println "disconnect database"))
+
+; -------------------------------------------------------------------------------------
+; SEARCH ITEMS
 
 (defn executeSearchTitle [searchVec]
-  (println "test"))
+  (println searchVec))
 
 (defn executeSearchPublisher [searchVec]
-  (println "test"))
-
-(defn executeModifyTitle [title]
-  (println "test"))
-
-(defn executeModifyPublisher [publisher]
-  (println "test"))
+  (println searchVec))
+; -------------------------------------------------------------------------------------
+; SEARCH ITEMS
 
 (defn executeAddTitle [title]
-  (println "test"))
+  (println title))
 
 (defn executeAddPublisher [publisher]
-  (println "test"))
+  (println publisher))
+
+; -------------------------------------------------------------------------------------
+; MODIFY ITEMS
+
+(defn executeModifyTitle [title]
+  (println title))
+
+(defn executeModifyPublisher [publisher]
+  (println publisher))
+
+; -------------------------------------------------------------------------------------
+; DELETE ITEMS
 
 (defn executeDeleteTitle [title]
-  (println "test"))
+  (println title))
 
 (defn executeDeletePublisher [publisher]
-  (println "test"))
+  (println publisher))
