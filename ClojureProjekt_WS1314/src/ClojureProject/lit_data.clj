@@ -1,12 +1,14 @@
 (ns ClojureProject.lit_data)
 
 
-;(defdb mySQLDatabase (mysql {:db "clojureprojekt"
- ;                        :host "localhost" 
-  ;                       :user "root" 
-   ;                      :password ""}))
-
 (declare title publisher)
+
+
+(defn connectDB [[db host user pass]]
+  (defdb mySQL (mysql {:db db :host host :user user :password pass})))
+
+
+(defn disconnect)
 
 ;(defentity title
  ; (database mySQLDatabase) 
