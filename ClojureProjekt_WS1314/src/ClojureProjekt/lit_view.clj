@@ -34,6 +34,8 @@
 
 ; MAP MIT KEYWORDS clojure blancas kern / i18n
 
+; TESTEINTRAG
+
 (def text_menubar_database_main_title "Datenbank")
 (def text_menubar_database_item_config "Datenbank konfigurieren")
 (def text_menubar_database_item_config_tooltip "Zeigt die aktuelle Konfigurieren der Datenbank-Verbindung an")
