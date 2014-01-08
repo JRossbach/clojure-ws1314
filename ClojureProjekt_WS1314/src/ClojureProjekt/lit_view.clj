@@ -34,19 +34,19 @@
 
 ; MAP MIT KEYWORDS clojure blancas kern / i18n
 
-(def text_manubar_database_main_title "Datenbank")
-(def text_manubar_database_item_config "Datenbank konfigurieren")
-(def text_manubar_database_item_config_tooltip "Zeigt die aktuelle Konfigurieren der Datenbank-Verbindung an")
-(def text_manubar_database_item_connect "Verbindung herstellen")
-(def text_manubar_database_item_connect_tooltip "Stellt eine Verbindung zur konfigurierten Datenbank her")
-(def text_manubar_database_item_disconnect "Verbindung trennen")
-(def text_manubar_database_item_disconnect_tooltip "Trennt die Verbindung zur konfigurierten Datenbank")
+(def text_menubar_database_main_title "Datenbank")
+(def text_menubar_database_item_config "Datenbank konfigurieren")
+(def text_menubar_database_item_config_tooltip "Zeigt die aktuelle Konfigurieren der Datenbank-Verbindung an")
+(def text_menubar_database_item_connect "Verbindung herstellen")
+(def text_menubar_database_item_connect_tooltip "Stellt eine Verbindung zur konfigurierten Datenbank her")
+(def text_menubar_database_item_disconnect "Verbindung trennen")
+(def text_menubar_database_item_disconnect_tooltip "Trennt die Verbindung zur konfigurierten Datenbank")
 
-(def text_manubar_operations_main_title "Operationen")
-(def text_manubar_operations_item_searchmodifydelete "Datensätze suchen / bearbeiten / löschen")
-(def text_manubar_operations_item_searchmodifydelete_tooltip "Hier können die Einträge der Datenbank eingesehen, verändert oder gelöscht werden")
-(def text_manubar_operations_item_add "Datensätze hinzufügen")
-(def text_manubar_operations_item_add_tooltip "Hier können neue Datensätze in die Datenbank eingepflegt werden")
+(def text_menubar_operations_main_title "Operationen")
+(def text_menubar_operations_item_searchmodifydelete "Datensätze suchen / bearbeiten / löschen")
+(def text_menubar_operations_item_searchmodifydelete_tooltip "Hier können die Einträge der Datenbank eingesehen, verändert oder gelöscht werden")
+(def text_menubar_operations_item_add "Datensätze hinzufügen")
+(def text_menubar_operations_item_add_tooltip "Hier können neue Datensätze in die Datenbank eingepflegt werden")
 
 (def text_database_border "Verbindungsdaten")
 (def text_database_host "Server")
@@ -127,42 +127,42 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MENU ACTIONS
 
-(def manubar_database_item_config_action (action
+(def menubar_database_item_config_action (action
                     :handler (fn [e] (switch database_panel))
-                    :name text_manubar_database_item_config
-                    :tip  text_manubar_database_item_config_tooltip))
+                    :name text_menubar_database_item_config
+                    :tip  text_menubar_database_item_config_tooltip))
 
-(def manubar_database_item_connect_action (action
+(def menubar_database_item_connect_action (action
                     :handler (fn [e] (alert "Datenbank-Verbindung herstellen"))
-                    :name text_manubar_database_item_connect
-                    :tip  text_manubar_database_item_connect_tooltip))
+                    :name text_menubar_database_item_connect
+                    :tip  text_menubar_database_item_connect_tooltip))
 
-(def manubar_database_item_disconnect_action (action
+(def menubar_database_item_disconnect_action (action
                     :handler (fn [e] (alert "Datenbank-Verbindung trennen"))
-                    :name text_manubar_database_item_disconnect
-                    :tip  text_manubar_database_item_disconnect_tooltip))
+                    :name text_menubar_database_item_disconnect
+                    :tip  text_menubar_database_item_disconnect_tooltip))
 
-(def manubar_operations_item_searchmodify_action (action
+(def menubar_operations_item_searchmodify_action (action
                     :handler (fn [e] (switch smd_panel))
-                    :name text_manubar_operations_item_searchmodifydelete
-                    :tip  text_manubar_operations_item_searchmodifydelete_tooltip))
+                    :name text_menubar_operations_item_searchmodifydelete
+                    :tip  text_menubar_operations_item_searchmodifydelete_tooltip))
 
-(def manubar_operations_item_add_action (action
+(def menubar_operations_item_add_action (action
                     :handler (fn [e] (switch add_panel))
-                    :name text_manubar_operations_item_add
-                    :tip  text_manubar_operations_item_add_tooltip))
+                    :name text_menubar_operations_item_add
+                    :tip  text_menubar_operations_item_add_tooltip))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MENU
 
 (def frame_menu (menubar :items 
-                        [(menu :text text_manubar_database_main_title 
-                                     :items [manubar_database_item_config_action
-                                             manubar_database_item_connect_action
-                                             manubar_database_item_disconnect_action])
-                               (menu :text text_manubar_operations_main_title
-                                     :items [manubar_operations_item_searchmodify_action
-                                             manubar_operations_item_add_action])]))
+                        [(menu :text text_menubar_database_main_title 
+                                     :items [menubar_database_item_config_action
+                                             menubar_database_item_connect_action
+                                             menubar_database_item_disconnect_action])
+                               (menu :text text_menubar_operations_main_title
+                                     :items [menubar_operations_item_searchmodify_action
+                                             menubar_operations_item_add_action])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DATABASE CONFIGURATION PANEL
