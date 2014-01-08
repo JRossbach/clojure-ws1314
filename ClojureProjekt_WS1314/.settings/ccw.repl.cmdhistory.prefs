@@ -1,0 +1,2 @@
+cmdhistory=["\\r\\n(select autor)" "(-> (select* autor)\\r\\n        (with titel)\\r\\n        (as-sql))" "(-> (select* titel)\\r\\n    (with autor)\\r\\n    (as-sql))" "(text field_database_host)" "(text\! field_database_host \\"Das ist Magie\!\\")" "(show field_database_host)" "(show-options field_database_host)" "(show-options frame_database)" "(show-options main_panel)" "main_panel" "(show-options (frame))" "(show-options frame_main)" "(show-options frame)" "(show-options frame_database)"]
+eclipse.preferences.version=1
