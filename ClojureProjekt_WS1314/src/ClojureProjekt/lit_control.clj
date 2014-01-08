@@ -1,20 +1,32 @@
 ; -------------------------------------------------------------------------------------
-(ns ClojureProject.lit_control)
+(ns ClojureProject.lit_control
+  (:require [ClojureProjekt.lit_data :as data]))
 
 ; -------------------------------------------------------------------------------------
 
-(defn saveConfiguration []  
-  (println [(config field_database_host :text)
-          (config field_database_name :text)
-          (config field_database_username :text)
-          (config field_database_password :text)]))
+(defn saveConfiguration [saveVec]  
+  (println saveVec))
 
-(defn executeSearch []
-  (println [(config field_smd_titel :text)
-          (config field_smd_autor :text)
-          (config field_smd_verlag :text)]))
+(defn executeSearchTitle [searchVec]
+  (println searchVec))
 
-(defn executeAdd []
-  (println [(config field_add_titel :text)
-          (config field_add_autor :text)
-          (config field_add_verlag :text)]))
+(defn executeSearchPublisher [searchVec]
+  (println searchVec))
+
+(defn executeModifyTitle [title]
+  (println title))
+
+(defn executeModifyPublisher [publisher]
+  (println title))
+
+(defn executeAddTitle [title]
+  (println title))
+
+(defn executeAddPublisher [publisher]
+  (println publisher))
+
+(defn executeDeleteTitle [title]
+  (println title))
+
+(defn executeDeletePublisher [publisher]
+  (println publisher))
