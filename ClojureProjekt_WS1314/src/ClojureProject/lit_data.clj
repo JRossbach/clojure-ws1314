@@ -114,12 +114,22 @@
 
 (defn deleteTitle
   "Deletes a title in the database"
-  [title] (println "delete title")
+  [title] (
+            (println "delete title")
+            (delete title (where {:isbn [="isbn"]}))
+            
+            )
+            
+            
   
   )
 
 (defn deletePublisher
   "Deletes a publisher in the database"
-  [publisher] (println "delete publisher")
+  [publisher] (
+                (println "delete publisher")
+                (delete publisher (where {:name [="name"]}))
+                
+                )
   
   )
