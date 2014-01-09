@@ -38,6 +38,11 @@
    :text_searchTitle_publisher "Verlag"
    :text_searchTitle_button_clear "Zurücksetzen"
    :text_searchTitle_button_search "Suchen"
+   
+   :text_searchPublisher_border "Verlag suchen"
+   :text_searchPublisher_name "Name"
+   :text_searchPublisher_button_clear "Zurücksetzen"
+   :text_searchPublisher_button_search "Suchen"
 					
    :text_addTitle_border "Literatur hinzufügen"
    :text_addTitle_name "Name"
@@ -47,15 +52,21 @@
    :text_addTitle_button_clear "Zurücksetzen"
    :text_addTitle_button_save "Speichern"
    
-   :text_searchPublisher_border "Verlag suchen"
-   :text_searchPublisher_name "Name"
-   :text_searchPublisher_button_clear "Zurücksetzen"
-   :text_searchPublisher_button_search "Suchen"
-   
    :text_addPublisher_border "Verlag hinzufügen"
    :text_addPublisher_name "Name"
    :text_addPublisher_button_clear "Zurücksetzen"
-   :text_addPublisher_button_save "Speichern"})
+   :text_addPublisher_button_save "Speichern"
+   
+   :text_modifyTitle_frame_title "Literatur bearbeiten"
+   :text_modifyTitle_name "Name"
+   :text_modifyTitle_isbn "ISBN"
+   :text_modifyTitle_author "Autor"
+   :text_modifyTitle_publisher "Verlag"
+   :text_modifyTitle_button_save "Speichern"
+   
+   :text_modifyPublisher_frame_title "Verlag bearbeiten"
+   :text_modifyPublisher_name "Name"
+   :text_modifypublisher_button_save "Speichern"})
 
 (def ^:private text (atom default))
 

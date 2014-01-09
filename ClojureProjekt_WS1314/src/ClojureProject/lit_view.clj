@@ -44,6 +44,18 @@
 (declare addPublisher_panel)
 (declare field_addPublisher_name)
 
+(declare modifyTitle_panel)
+(declare field_modifyTitle_name)
+(declare field_modifyTitle_isbn)
+(declare field_modifyTitle_author)
+(declare field_modifyTitle_publisher)
+
+(declare modifyPublisher_panel)
+(declare field_modifyPublisher_name)
+
+(declare frame_modifyTitle)
+(declare frame_modifyPublisher)
+
 (declare frame_menu)
 (declare frame_main)
 
@@ -131,6 +143,14 @@
 (def button_addPublisher_save_action (action
                                    :handler (fn [e] (viewExecuteAddPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_addPublisher_button_save)))
+
+(def button_modifyTitle_save_action (action
+                                   :handler (fn [e] ())
+                                   :name (ClojureProject.lit_i18n/i18n :text_modifyTitle_button_save)))
+
+(def button_modifyPublisher_save_action (action
+                                   :handler (fn [e] ())
+                                   :name (ClojureProject.lit_i18n/i18n :text_modifyPublisher_button_save)))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MENU ACTIONS
@@ -240,28 +260,6 @@
 (def searchTitle_panel (top-bottom-split searchTitle_search_panel searchTitle_search_table))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
-; ADD TITLE PANEL
-
-(def field_addTitle_name (text))
-(def field_addTitle_isbn (text))
-(def field_addTitle_author (text))
-(def field_addTitle_publisher (text))
-
-(def addTitle_panel (grid-panel
-                      :border (ClojureProject.lit_i18n/i18n :text_addTitle_border)
-                      :columns 1 
-                      :items [(grid-panel
-                                :columns 2
-                                :items [(ClojureProject.lit_i18n/i18n :text_addTitle_name) field_addTitle_name
-                                        (ClojureProject.lit_i18n/i18n :text_addTitle_isbn) field_addTitle_isbn
-                                        (ClojureProject.lit_i18n/i18n :text_addTitle_author) field_addTitle_author
-                                        (ClojureProject.lit_i18n/i18n :text_addTitle_publisher) field_addTitle_publisher])
-                              (flow-panel
-                                :align :right
-                                :items [(button :action button_addTitle_clear_action)
-                                        (button :action button_addTitle_save_action)])]))
-
-;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH PUBLISHER PANEL
 
 (def field_searchPublisher_name (text))
@@ -286,6 +284,28 @@
 (def searchPublisher_panel (top-bottom-split searchPublisher_search_panel searchPublisher_search_table))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
+; ADD TITLE PANEL
+
+(def field_addTitle_name (text))
+(def field_addTitle_isbn (text))
+(def field_addTitle_author (text))
+(def field_addTitle_publisher (text))
+
+(def addTitle_panel (grid-panel
+                      :border (ClojureProject.lit_i18n/i18n :text_addTitle_border)
+                      :columns 1 
+                      :items [(grid-panel
+                                :columns 2
+                                :items [(ClojureProject.lit_i18n/i18n :text_addTitle_name) field_addTitle_name
+                                        (ClojureProject.lit_i18n/i18n :text_addTitle_isbn) field_addTitle_isbn
+                                        (ClojureProject.lit_i18n/i18n :text_addTitle_author) field_addTitle_author
+                                        (ClojureProject.lit_i18n/i18n :text_addTitle_publisher) field_addTitle_publisher])
+                              (flow-panel
+                                :align :right
+                                :items [(button :action button_addTitle_clear_action)
+                                        (button :action button_addTitle_save_action)])]))
+
+;-------------------------------------------------------------------------------------------------------------------------------
 ; ADD PUBLISHER PANEL
 
 (def field_addPublisher_name (text))
@@ -300,6 +320,40 @@
                                     :align :right
                                     :items [(button :action button_addPublisher_clear_action)
                                             (button :action button_addPublisher_save_action)])]))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; MODIFY TITLE PANEL / FRAME
+
+(def field_modifyTitle_name (text))
+(def field_modifyTitle_isbn (text))
+(def field_modifyTitle_author (text))
+(def field_modifyTitle_publisher (text))
+
+(def modifyTitle_panel (grid-panel
+                         :columns 1 
+                         :items [(grid-panel
+                                   :columns 2
+                                   :items [(ClojureProject.lit_i18n/i18n :text_modifyTitle_name) field_modifyTitle_name
+                                           (ClojureProject.lit_i18n/i18n :text_modifyTitle_isbn) field_modifyTitle_isbn
+                                           (ClojureProject.lit_i18n/i18n :text_modifyTitle_author) field_modifyTitle_author
+                                           (ClojureProject.lit_i18n/i18n :text_modifyTitle_publisher) field_modifyTitle_publisher])
+                                 (flow-panel
+                                   :align :right
+                                   :items [(button :action button_modifyTitle_save_action)])]))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; MODIFY PUBLISHER PANEL / FRAME
+
+(def field_modifyPublisher_name (text))
+
+(def modifyPublisher_panel (grid-panel
+                             :columns 1 
+                             :items [(grid-panel
+                                       :columns 2
+                                       :items [(ClojureProject.lit_i18n/i18n :text_modifyPublisher_name) field_modifyPublisher_name])
+                                     (flow-panel
+                                       :align :right
+                                       :items [(button :action button_modifyPublisher_save_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MAIN FRAME
