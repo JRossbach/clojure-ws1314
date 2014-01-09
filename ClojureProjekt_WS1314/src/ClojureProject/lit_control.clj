@@ -1,6 +1,9 @@
 ; -------------------------------------------------------------------------------------
-(ns ClojureProject.lit_control
-  (:require [ClojureProject.lit_data :as data]))
+;(ns ClojureProject.lit_control
+;  (:require [ClojureProject.lit_data :as data]))
+
+(ns ClojureProject.lit_control)
+(require '[ClojureProject.lit_data :refer :all])
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE OPERATIONS
@@ -10,11 +13,11 @@
   [saveVec]  
   (println saveVec))
 
-(defn connectDatabase []  
-  (println "connect database"))
+(defn controlConnectDatabase [db host user password]  
+  (ClojureProject.lit_data/connectDatabase db host user password))
 
-(defn disconnectDatabase []  
-  (println "disconnect database"))
+(defn controlDisconnectDatabase []  
+  (ClojureProject.lit_data/connectDatabase))
 
 ; -------------------------------------------------------------------------------------
 ; SEARCH ITEMS

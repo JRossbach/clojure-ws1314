@@ -26,13 +26,23 @@
 (declare searchTitle_search_table)
 (declare searchTitle_panel)
 (declare field_searchTitle_name)
+(declare field_searchTitle_isbn)
 (declare field_searchTitle_author)
 (declare field_searchTitle_publisher)
 
+(declare searchPublisher_search_panel)
+(declare searchPublisher_search_table)
+(declare searchPublisher_panel)
+(declare field_searchPublisher_name)
+
 (declare addTitle_panel)
 (declare field_addTitle_name)
+(declare field_addTitle_isbn)
 (declare field_addTitle_author)
 (declare field_addTitle_publisher)
+
+(declare addPublisher_panel)
+(declare field_addPublisher_name)
 
 (declare frame_menu)
 (declare frame_main)
@@ -44,10 +54,7 @@
   (config! frame_main :content container))
 
 (defn viewSaveConfiguration []
-  (ClojureProject.lit_control/saveConfiguration [(config field_database_host :text)
-                                                 (config field_database_name :text)
-                                                 (config field_database_username :text)
-                                                 (config field_database_password :text)]))
+  (ClojureProject.lit_control/saveConfiguration))
 
 (defn viewClearSearchTitle []
   (config! field_searchTitle_name :text "")
@@ -134,12 +141,16 @@
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_config_tooltip)))
 
 (def menubar_database_item_connect_action (action
-                    :handler (fn [e] (alert "Datenbank-Verbindung herstellen"))
+                    :handler (fn [e] (ClojureProject.lit_control/controlConnectDatabase (config field_database_host :text)
+                                                                                        (config field_database_name :text)
+                                                                                        (config field_database_username :text)
+                                                                                        (config field_database_password :text)))
+                    :handler (fn [e] ())
                     :name (ClojureProject.lit_i18n/i18n :text_menubar_database_item_connect)
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_connect_tooltip)))
 
 (def menubar_database_item_disconnect_action (action
-                    :handler (fn [e] (alert "Datenbank-Verbindung trennen"))
+                    :handler (fn [e] (ClojureProject.lit_control/controlDisconnectDatabase))
                     :name (ClojureProject.lit_i18n/i18n :text_menubar_database_item_disconnect)
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_disconnect_tooltip)))
 
@@ -167,23 +178,24 @@
 ; MENU
 
 (def frame_menu (menubar :items 
-                        [(menu :text (ClojureProject.lit_i18n/i18n :text_menubar_database_main_title) 
-                                     :items [menubar_database_item_config_action
-                                             menubar_database_item_connect_action
-                                             menubar_database_item_disconnect_action])
-                               (menu :text (ClojureProject.lit_i18n/i18n :text_menubar_operations_main_title)
-                                     :items [menubar_operations_item_searchTitle_action
-                                             menubar_operations_item_addTitle_action
-                                             menubar_operations_item_searchPublisher_action
-                                             menubar_operations_item_addPublisher_action])]))
+                         [(menu :text (ClojureProject.lit_i18n/i18n :text_menubar_database_main_title) 
+                                :items [menubar_database_item_config_action
+                                        menubar_database_item_connect_action
+                                        menubar_database_item_disconnect_action])
+                          (menu :text (ClojureProject.lit_i18n/i18n :text_menubar_operations_main_title)
+                                :items [menubar_operations_item_searchTitle_action
+                                        menubar_operations_item_addTitle_action
+                                        menubar_operations_item_searchPublisher_action
+                                        menubar_operations_item_addPublisher_action])]))
+
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DATABASE CONFIGURATION PANEL
 
-(def field_database_host (text))
-(def field_database_name (text))
-(def field_database_username (text))
-(def field_database_password (text))
+(def field_database_host (text "localhost"))
+(def field_database_name (text "clojureprojekt"))
+(def field_database_username (text"root"))
+(def field_database_password (text ""))
 
 (def database_panel (grid-panel 
                       :border (ClojureProject.lit_i18n/i18n :text_database_border)

@@ -1,37 +1,45 @@
 ; -------------------------------------------------------------------------------------
 (ns ClojureProject.lit_data)
 
-(require '[clojure.string :as str])
+(use 'korma.core)
 (use 'korma.db)
+(require '[clojure.string :as str])
+
+; -------------------------------------------------------------------------------------
+; DECLARETIONS
+
+; declare entities
+(declare title publisher)
+
+; declare database
+(declare mySQLDatabase)
 
 ; -------------------------------------------------------------------------------------
 ; DATA STRUCTURE
-
-(declare title publisher)
 
 (defentity title
   (database mySQLDatabase) 
   (pk :id) 
   (table :tbl_title)
   (entity-fields :name :isbn :author :publisher_id)
-  (belongs-to verlag {:fk :publisher_id}))
+  (belongs-to publisher {:fk :publisher_id}))
 
 (defentity publisher
   (database mySQLDatabase) 
   (pk :id) 
   (table :tbl_publisher)
   (entity-fields :name)) 
-
+  
 ; -------------------------------------------------------------------------------------
 ; DATABASE
 
 (defn connectDatabase 
   "Opens the connection to a database with the given connection data."
-  [db host user password] (defdb (mysql {:db db :host host :user user :password password})))
+  [db host user password] (defdb mySQLDatabase (mysql {:db db :host host :user user :password password})))
 
 
 (defn disconnectDatabase
-  "Closes the connection to the database with pre definied connection data."
+  "Closes the connection to the actual defined database."
   [] ())
 
 ; -------------------------------------------------------------------------------------
@@ -39,13 +47,13 @@
 
 (defn selectTitle
   "Selects a number of titles from the database"
-  [] (println "selects all titles")
-  [conditions] (println "selects all title with the given conditions"))
+  ([] (select title))
+  ([conditions] (select title (where conditions))))
 
 (defn selectPublisher
   "Selects a number of publishers from the database"
-  [] (println "selects all publishers")
-  [conditions] (println "select a publisher with conditions"))
+  ([] (select publisher))
+  ([conditions] (select publisher (where conditions))))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE INSERT
