@@ -5,7 +5,9 @@
 ; -------------------------------------------------------------------------------------
 ; DATABASE OPERATIONS
 
-(defn saveConfiguration [saveVec]  
+(defn saveConfiguration 
+  ""
+  [saveVec]  
   (println saveVec))
 
 (defn connectDatabase []  

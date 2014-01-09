@@ -1,53 +1,81 @@
+; -------------------------------------------------------------------------------------
 (ns ClojureProject.lit_data)
 
-(use 'korma.db)
 (require '[clojure.string :as str])
+(use 'korma.db)
+
+; -------------------------------------------------------------------------------------
+; DATA STRUCTURE
 
 (declare title publisher)
 
+(defentity title
+  (database mySQLDatabase) 
+  (pk :id) 
+  (table :tbl_title)
+  (entity-fields :name :isbn :author :publisher_id)
+  (belongs-to verlag {:fk :publisher_id}))
 
-(defn connectDB [[db host user pass]]
-  (def mySQL (mysql {:db db :host host :user user :password pass}))
-  (defdb main mySQL)
- )
+(defentity publisher
+  (database mySQLDatabase) 
+  (pk :id) 
+  (table :tbl_publisher)
+  (entity-fields :name)) 
 
+; -------------------------------------------------------------------------------------
+; DATABASE
 
-(defn disconnect)
-
-;(defentity title
- ; (database mySQLDatabase) 
-;  (pk :id) 
- ; (table :tbl_title)
- ; (entity-fields :name :isbn :author :publisher_id)
- ; (belongs-to verlag {:fk :publisher_id}))
-
-;(defentity publisher
-;  (database mySQLDatabase) 
- ; (pk :id) 
-;  (table :tbl_publisher)
- ; (entity-fields :name)) 
+(defn connectDatabase 
+  "Opens the connection to a database with the given connection data."
+  [db host user password] (defdb (mysql {:db db :host host :user user :password password})))
 
 
-;(select autor)
-;(select titel)
-;(select verlag)
+(defn disconnectDatabase
+  "Closes the connection to the database with pre definied connection data."
+  [] ())
 
-;(select autor
-;        (with titel))
+; -------------------------------------------------------------------------------------
+; DATABASE SELECT
 
-;(select titel
- ;       (with autor))
+(defn selectTitle
+  "Selects a number of titles from the database"
+  [] (println "selects all titles")
+  [conditions] (println "selects all title with the given conditions"))
 
-;(select titel
- ;       (with verlag))
+(defn selectPublisher
+  "Selects a number of publishers from the database"
+  [] (println "selects all publishers")
+  [conditions] (println "select a publisher with conditions"))
 
-;(type (select autor
- ;       (with titel)))
+; -------------------------------------------------------------------------------------
+; DATABASE INSERT
 
-;(-> (select* titel)
- ;   (with autor)
- ;   (where {:vorname "Alexander"})
-  ;  (as-sql))
+(defn insertTitle
+  "Inserts a title in the database"
+  [title] (println "insert title"))
 
-;(-> (select* titel)
-   ; (as-sql))
+(defn insertPublisher
+  "Inserts a publisher in the database"
+  [publisher] (println "insert publisher"))
+
+; -------------------------------------------------------------------------------------
+; DATABASE UPDATE
+
+(defn updateTitle
+  "Updates a title in the database"
+  [title] (println "modify title"))
+
+(defn updatePublisher
+  "Updates a publisher in the database"
+  [publisher] (println "modify publisher"))
+
+; -------------------------------------------------------------------------------------
+; DATABASE DELETE
+
+(defn deleteTitle
+  "Deletes a title in the database"
+  [title] (println "delete title"))
+
+(defn deletePublisher
+  "Deletes a publisher in the database"
+  [publisher] (println "delete publisher"))
