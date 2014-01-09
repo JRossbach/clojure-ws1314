@@ -91,7 +91,7 @@
                 ;TODO: map "name" to object attribute
                 (insert publisher (values {
                                            :name "name"
-                                           }
+                                          }
                                      )
                    )
             )
