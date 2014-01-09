@@ -67,23 +67,10 @@
 
 (defn insertTitle
   "Inserts a title in the database"
-  [title] (println "insert title")
-  
-  )
-
-(defn insertPublisher
-  "Inserts a publisher in the database"
-  [publisher] (println "insert publisher")
-  
-  )
-
-; -------------------------------------------------------------------------------------
-; DATABASE UPDATE
-
-(defn updateTitle
-  "Updates a title in the database"
   [title] (
-            (println "modify title")
+            (println "insert title")
+            
+            ;TODO: map values to object attributes
             (insert title (values {
                                    :isbn "isbn" 
                                    :name "name"
@@ -96,16 +83,34 @@
   
   )
 
+(defn insertPublisher
+  "Inserts a publisher in the database"
+  [publisher] (
+                (println "insert publisher")
+                
+                ;TODO: map "name" to object attribute
+                (insert publisher (values {
+                                           :name "name"
+                                           }
+                                     )
+                   )
+            )
+  
+  )
+
+; -------------------------------------------------------------------------------------
+; DATABASE UPDATE
+
+(defn updateTitle
+  "Updates a title in the database"
+  [title] (println "modify title")
+            
+  )
+
 (defn updatePublisher
   "Updates a publisher in the database"
-  [publisher] (
+  [publisher]
                 (println "modify publisher")
-                 (insert publisher (values {
-                                            :name "name"
-                                            }
-                                      )
-                    )
-            )
   
   )
 
@@ -116,6 +121,8 @@
   "Deletes a title in the database"
   [title] (
             (println "delete title")
+            
+            ;TODO: map "isbn" to object attribute
             (delete title (where {:isbn [="isbn"]}))
             
             )
@@ -128,6 +135,8 @@
   "Deletes a publisher in the database"
   [publisher] (
                 (println "delete publisher")
+               
+                ;TODO: map "name" to object attribute
                 (delete publisher (where {:name [="name"]}))
                 
                 )
