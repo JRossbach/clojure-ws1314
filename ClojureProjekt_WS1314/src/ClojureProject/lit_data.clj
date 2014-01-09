@@ -15,28 +15,26 @@
 (declare mySQLDatabase)
 
 ; -------------------------------------------------------------------------------------
-; DATA STRUCTURE
-
-(defentity title
-  (database mySQLDatabase) 
-  (pk :id) 
-  (table :tbl_title)
-  (entity-fields :name :isbn :author :publisher_id)
-  (belongs-to publisher {:fk :publisher_id}))
-
-(defentity publisher
-  (database mySQLDatabase) 
-  (pk :id) 
-  (table :tbl_publisher)
-  (entity-fields :name)) 
-  
-; -------------------------------------------------------------------------------------
 ; DATABASE
 
 (defn connectDatabase 
   "Opens the connection to a database with the given connection data."
-  [db host user password] (defdb mySQLDatabase (mysql {:db db :host host :user user :password password})))
+  ([host db user password] (defdb mySQLDatabase (mysql {:host host
+                                                        :db db  
+                                                        :user user 
+                                                        :password password})) 
+                           (defentity title
+                             (database mySQLDatabase) 
+                             (pk :id) 
+                             (table :tbl_title)
+                             (entity-fields :name :isbn :author :publisher_id)
+                             (belongs-to publisher {:fk :publisher_id}))
 
+                           (defentity publisher
+                             (database mySQLDatabase) 
+                             (pk :id) 
+                             (table :tbl_publisher)
+                             (entity-fields :name))))                         
 
 (defn disconnectDatabase
   "Closes the connection to the actual defined database."
@@ -46,7 +44,7 @@
 ; DATABASE SELECT
 
 (defn selectTitle
-  "Selects a number of titles from the database"
+  "Selects a number of titles from the database"  
   ([] (select title))
   ([conditions] (select title (where conditions))))
 

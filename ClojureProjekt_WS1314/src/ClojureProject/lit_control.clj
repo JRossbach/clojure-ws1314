@@ -9,26 +9,25 @@
 ; DATABASE OPERATIONS
 
 (defn saveConfiguration 
-  ""
-  [saveVec]  
-  (println saveVec))
+  [] ())
 
-(defn controlConnectDatabase [db host user password]  
-  (ClojureProject.lit_data/connectDatabase db host user password))
+(defn controlConnectDatabase [host db user password]  
+  (ClojureProject.lit_data/connectDatabase host db user password))
 
 (defn controlDisconnectDatabase []  
-  (ClojureProject.lit_data/connectDatabase))
+  (ClojureProject.lit_data/disconnectDatabase))
 
 ; -------------------------------------------------------------------------------------
 ; SEARCH ITEMS
 
 (defn executeSearchTitle [searchVec]
-  (println searchVec))
+  (println (ClojureProject.lit_data/selectTitle)))
 
 (defn executeSearchPublisher [searchVec]
-  (println searchVec))
+  (println (ClojureProject.lit_data/selectPublisher)))
+
 ; -------------------------------------------------------------------------------------
-; SEARCH ITEMS
+; ADD ITEMS
 
 (defn executeAddTitle [title]
   (println title))

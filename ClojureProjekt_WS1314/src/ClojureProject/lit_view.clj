@@ -145,7 +145,6 @@
                                                                                         (config field_database_name :text)
                                                                                         (config field_database_username :text)
                                                                                         (config field_database_password :text)))
-                    :handler (fn [e] ())
                     :name (ClojureProject.lit_i18n/i18n :text_menubar_database_item_connect)
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_connect_tooltip)))
 
