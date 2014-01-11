@@ -1,4 +1,4 @@
-; -------------------------------------------------------------------------------------
+;This class is responsible for den database connection and CRUD-methods----------------
 (ns ClojureProject.lit_data)
 
 (use 'korma.core)
