@@ -71,16 +71,16 @@
   [title] (
             (println "insert title")
             
-            ;TODO: map values to object attributes
-            (insert title (values {
-                                   :isbn (:isbn title)
-                                   :name (:name title)
-                                   :author (:author title)
-                                   :publisher_id (:publisher_id title)
-                                   }
-                                  )
-                    )
-            )
+            (insert title 
+                    (values {
+                             :isbn (:isbn title)
+                             :name (:name title)
+                             :author (:author title)
+                             :publisher_id (:publisher_id title)
+                             }
+                        )
+              )
+          )
   
   )
 
@@ -89,11 +89,11 @@
   [publisher] (
                 (println "insert publisher")
                 
-                ;TODO: map "name" to object attribute
-                (insert publisher (values {
-                                           :name (:name publisher)
-                                          }
-                                     )
+                (insert publisher 
+                        (values {
+                                 :name (:name publisher)
+                                }
+                           )
                    )
             )
   
@@ -105,26 +105,30 @@
 (defn updateTitle
   "Updates a title in the database"
   [title] (
-               (update title
+            (println "modify title")
+            
+            (update title
                       
-                       (set-fields {
-                                    :isbn (:isbn title) 
-                                    :name (:name title)
-                                    :author (:author title)
-                                    :publisher_id (:publisher_id title)
-                                    }
-                                   )
+                    (set-fields {
+                                 :isbn (:isbn title) 
+                                 :name (:name title)
+                                 :author (:author title)
+                                 :publisher_id (:publisher_id title)
+                                 }
+                                )
                        
-                       (where {:id [= (:id title)]})
-                )
+                    (where {:id [= (:id title)]})
+             )
                
-               (println "modify title")
+               
          )
   )
 
 (defn updatePublisher
   "Updates a publisher in the database"
   [publisher] (
+                (println "modify publisher")
+                
                 (update publisher
                        
                         (set-fields {
@@ -135,7 +139,6 @@
                         (where {:id [= (:id publisher)]})
                  )
 
-                 (println "modify publisher")
                )
   )
 
@@ -147,7 +150,6 @@
   [title] (
             (println "delete title")
             
-            ;TODO: map "isbn" to object attribute
             (delete title (where {:isbn [= (:isbn title)]}))
             
             )
@@ -161,7 +163,6 @@
   [publisher] (
                 (println "delete publisher")
                
-                ;TODO: map "name" to object attribute
                 (delete publisher (where {:name [= (:name publisher)]}))
                 
                 )
