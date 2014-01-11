@@ -34,7 +34,8 @@
                              (database mySQLDatabase) 
                              (pk :id) 
                              (table :tbl_publisher)
-                             (entity-fields :name)))
+                             (entity-fields :name))
+                           )
   
   
   )                         
@@ -103,15 +104,33 @@
 
 (defn updateTitle
   "Updates a title in the database"
-  [title] (println "modify title")
-            
+  [title] (
+               (update title
+                       ;TODO: map attributes to object attribute
+                       (set-fields {
+                                    :isbn "isbn" 
+                                    :name "name"
+                                    :author "author"
+                                    :publisher_id "publisher"}
+                                   )
+                       (where {:id [= "id"]})
+                )
+               
+               (println "modify title")
+         )
   )
 
 (defn updatePublisher
   "Updates a publisher in the database"
-  [publisher]
+  [publisher](
+               (update publisher
+                       ;TODO: map "id", "name" to object attribute
+                       (set-fields {:name "name"})
+                       (where {:id [= "id"]})
+                       )
+
                 (println "modify publisher")
-  
+  )
   )
 
 ; -------------------------------------------------------------------------------------
