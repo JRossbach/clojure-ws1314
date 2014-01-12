@@ -25,7 +25,7 @@
 
 (defn executeSearchTitle 
   ""
-  [searchTitleVector] (println (ClojureProject.lit_data/selectTitle)))
+  [searchTitleMap] (println (get (ClojureProject.lit_data/selectTitle) 1)))
 
 (defn executeSearchPublisher 
   ""
@@ -36,14 +36,14 @@
 
 (defn executeAddTitle 
   ""
-  [addTitleVector] (ClojureProject.lit_data/insertTitle {:isbn (:isbn title)
-                                                         :name (:name title)
-                                                         :author (:author title)
-                                                         :publisher_id (:publisher_id title)}))
+  [addTitleVector] (ClojureProject.lit_data/insertTitle {:name (get addTitleVector 1)
+                                                         :isbn (get addTitleVector 2)                                                         
+                                                         :author (get addTitleVector 3)
+                                                         :publisher_id (get addTitleVector 4)}))
 
 (defn executeAddPublisher 
   ""
-  [addPublisherVector] (ClojureProject.lit_data/insertPublisher {:name (:name publisher)})
+  [addPublisherVector] (ClojureProject.lit_data/insertPublisher {:name (get addPublisherVector 1)}))
 
 ; -------------------------------------------------------------------------------------
 ; MODIFY ITEMS

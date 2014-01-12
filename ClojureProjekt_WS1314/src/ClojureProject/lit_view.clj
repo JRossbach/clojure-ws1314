@@ -81,10 +81,10 @@
   (config! field_addTitle_publisher :text ""))
 
 (defn viewExecuteSearchTitle []
-  (ClojureProject.lit_control/executeSearchTitle [(config field_searchTitle_name :text)
-                                                  (config field_searchTitle_isbn :text)
-                                                  (config field_searchTitle_author :text)
-                                                  (config field_searchTitle_publisher :text)]))
+  (ClojureProject.lit_control/executeSearchTitle {:name (str (config field_searchTitle_name :text))
+                                                  :isbn (str (config field_searchTitle_isbn :text))
+                                                  :author (str (config field_searchTitle_author :text))
+                                                  :publisher_id (str (config field_searchTitle_publisher :text))}))
 
 (defn viewExecuteAddTitle []
   (ClojureProject.lit_control/executeAddTitle [(config field_addTitle_name :text)
