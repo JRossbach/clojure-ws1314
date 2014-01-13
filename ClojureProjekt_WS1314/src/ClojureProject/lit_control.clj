@@ -14,7 +14,7 @@
 
 (defn controlConnectDatabase 
   ""
-  [host db user password] (ClojureProject.lit_data/connectDatabase host db user password))
+  [host db user password] (ClojureProject.lit_data/connectDatabase {:host host :db db :user user :password password}))
 
 (defn controlDisconnectDatabase 
   ""
@@ -25,22 +25,25 @@
 
 (defn executeSearchTitle 
   ""
-  [searchTitleVec] (println (ClojureProject.lit_data/selectTitle)))
+  [searchTitleMap] (println (get (ClojureProject.lit_data/selectTitle) 1)))
 
 (defn executeSearchPublisher 
   ""
-  [searchPublisherVec] (println (ClojureProject.lit_data/selectPublisher)))
+  [searchPublisherVector] (println (ClojureProject.lit_data/selectPublisher)))
 
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
 
 (defn executeAddTitle 
   ""
-  [title] (println title))
+  [addTitleVector] (ClojureProject.lit_data/insertTitle {:name (get addTitleVector 1)
+                                                         :isbn (get addTitleVector 2)                                                         
+                                                         :author (get addTitleVector 3)
+                                                         :publisher_id (get addTitleVector 4)}))
 
 (defn executeAddPublisher 
   ""
-  [publisher] (println publisher))
+  [addPublisherVector] (ClojureProject.lit_data/insertPublisher {:name (get addPublisherVector 1)}))
 
 ; -------------------------------------------------------------------------------------
 ; MODIFY ITEMS
@@ -58,8 +61,8 @@
 
 (defn executeDeleteTitle 
   ""
-  [title] (println title))
+  [titleId] (ClojureProject.lit_data/deleteTitle titleId))
 
 (defn executeDeletePublisher 
   ""
-  [publisher] (println publisher))
+  [publisherId] (ClojureProject.lit_data/deletePublisher publisherId))
