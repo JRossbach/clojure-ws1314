@@ -124,6 +124,8 @@
 
 (defn handleExecuteDeletePublisher [])
 
+(listen searchTitle_search_table :selection (fn [e] (println "PENIS")))
+
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
 
@@ -276,6 +278,7 @@
 
 (def searchTitle_search_table (scrollable (table 
                                      :model [
+                                             :handler
                                              :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
                                              :rows [["01" "Alexander Nadler"]
                                                     ["02" "Julian Rossbach"]]])))
