@@ -43,13 +43,20 @@
 
 (defn selectTitle
   "Selects a number of titles from the database"  
-  ([] (select title))
-  ([conditions] (select title (where conditions))))
+  
+  ([] (select title (order :name :ASC)))
+  
+  ([conditions] (select title (where {:isbn [like (get conditions :isbn)]
+                                      :name [like (get conditions :name)]
+                                      :author [like (get conditions :author)]}))
+                (order :name :ASC)))
 
 (defn selectPublisher
   "Selects a number of publishers from the database"
-  ([] (select publisher))
-  ([conditions] (select publisher (where conditions))))
+  
+  ([] (select publisher (order :name :ASC)))
+  
+  ([conditions] (select publisher (where {:name [like (get conditions :name)]}) (order :name :ASC))))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE INSERT
@@ -68,17 +75,17 @@
 (defn updateTitle
   "Updates a title in the database"
   [title] (update title 
-                  (set-fields {:isbn (:isbn title) 
-                               :name (:name title)
-                               :author (:author title)
-                               :publisher_id (:publisher_id title)})
-                  (where {:id [= (:id title)]})))
+                  (set-fields {:isbn (get title :isbn) 
+                               :name (get title :name)
+                               :author (get title :author)
+                               :publisher_id (get title :publisher_id)})
+                  (where {:id [= (get title :id)]})))
 
 (defn updatePublisher
   "Updates a publisher in the database"
   [publisher] (update publisher
-                      (set-fields {:name (:name publisher)})                        
-                      (where {:id [= (:id publisher)]})))
+                      (set-fields {:name (get publisher :name)})                        
+                      (where {:id [= (get publisher :id)]})))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE DELETE
