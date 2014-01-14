@@ -36,7 +36,7 @@
 
 (defn disconnectDatabase
   "Closes the connection to the actual defined database."
-  [] ())
+  ([] (-> (connection-pool (get-connection mySQLDatabase)):datasource .close)))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE SELECT
