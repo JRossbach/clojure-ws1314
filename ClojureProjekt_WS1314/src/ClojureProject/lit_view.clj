@@ -23,6 +23,7 @@
 (declare field_database_password)
 
 (declare searchTitle_search_panel)
+(declare searchPublisher_result_panel)
 (declare searchTitle_search_table)
 (declare searchTitle_panel)
 (declare field_searchTitle_name)
@@ -31,6 +32,7 @@
 (declare field_searchTitle_publisher)
 
 (declare searchPublisher_search_panel)
+(declare searchPublisher_result_panel)
 (declare searchPublisher_search_table)
 (declare searchPublisher_panel)
 (declare field_searchPublisher_name)
@@ -65,92 +67,117 @@
 (defn switch [container]
   (config! frame_main :content container))
 
-(defn viewSaveConfiguration []
+(defn handleSaveConfiguration []
   (ClojureProject.lit_control/saveConfiguration))
 
-(defn viewClearSearchTitle []
+(defn handleConnectDatabase []
+  (ClojureProject.lit_control/controlConnectDatabase (config field_database_host :text)
+                                                     (config field_database_name :text)
+                                                     (config field_database_username :text)
+                                                     (config field_database_password :text)))
+
+(defn handleDisconnectDatabase []
+ (ClojureProject.lit_control/controlDisconnectDatabase))
+
+(defn handleClearSearchTitle []
   (config! field_searchTitle_name :text "")
   (config! field_searchTitle_isbn :text "")
   (config! field_searchTitle_author :text "")
   (config! field_searchTitle_publisher :text ""))
 
-(defn viewClearAddTitle []
+(defn handleClearSearchPublisher []
+  (config! field_searchPublisher_name :text ""))
+
+(defn handleClearAddTitle []
   (config! field_addTitle_name :text "")
   (config! field_addTitle_isbn :text "")
   (config! field_addTitle_author :text "")
   (config! field_addTitle_publisher :text ""))
 
-(defn viewExecuteSearchTitle []
-  (ClojureProject.lit_control/executeSearchTitle {:name (str (config field_searchTitle_name :text))
-                                                  :isbn (str (config field_searchTitle_isbn :text))
-                                                  :author (str (config field_searchTitle_author :text))
-                                                  :publisher_id (str (config field_searchTitle_publisher :text))}))
+(defn handleClearAddPublisher []
+  (config! field_addPublisher_name :text ""))
 
-(defn viewExecuteAddTitle []
+
+(defn handleExecuteAddTitle []
   (ClojureProject.lit_control/executeAddTitle [(config field_addTitle_name :text)
                                                (config field_addTitle_isbn :text)
                                                (config field_addTitle_author :text)
                                                (config field_addTitle_publisher :text)]))
 
-(defn viewClearSearchPublisher []
-  (config! field_searchPublisher_name :text ""))
-
-(defn viewClearAddPublisher []
-  (config! field_addPublisher_name :text ""))
-
-(defn viewExecuteSearchPublisher []
-  (ClojureProject.lit_control/executeSearchPublisher [(config field_searchPublisher_name :text)]))
-
-(defn viewExecuteAddPublisher []
+(defn handleExecuteAddPublisher []
   (ClojureProject.lit_control/executeAddPublisher [(config field_addPublisher_name :text)]))
 
+(defn handleExecuteSearchTitle []
+  (ClojureProject.lit_control/executeSearchTitle {:name (str (config field_searchTitle_name :text))
+                                                  :isbn (str (config field_searchTitle_isbn :text))
+                                                  :author (str (config field_searchTitle_author :text))
+                                                  :publisher_id (str (config field_searchTitle_publisher :text))}))
+
+(defn handleExecuteSearchPublisher []
+  (ClojureProject.lit_control/executeSearchPublisher [(config field_searchPublisher_name :text)]))
+
+(defn handleExecuteModificateTitle [])
+
+(defn handleExecuteModificatePublisher [])
+
+(defn handleExecuteDeleteTitle [])
+
+(defn handleExecuteDeletePublisher [])
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
 
 (def button_database_save_action (action
-                                   :handler (fn [e] (viewSaveConfiguration))
+                                   :handler (fn [e] (handleSaveConfiguration))
                                    :name (ClojureProject.lit_i18n/i18n :text_database_button_save)))
 
 (def button_searchTitle_clear_action (action
-                                   :handler (fn [e] (viewClearSearchTitle))
+                                   :handler (fn [e] (handleClearSearchTitle))
                                    :name (ClojureProject.lit_i18n/i18n :text_searchTitle_button_clear)))
 
 (def button_searchTitle_search_action (action
-                                   :handler (fn [e] (viewExecuteSearchTitle))
+                                   :handler (fn [e] (handleExecuteSearchTitle))
                                    :name (ClojureProject.lit_i18n/i18n :text_searchTitle_button_search)))
 
 (def button_addTitle_clear_action (action
-                                   :handler (fn [e] (viewClearAddTitle))
+                                   :handler (fn [e] (handleClearAddTitle))
                                    :name (ClojureProject.lit_i18n/i18n :text_addTitle_button_clear)))
 
 (def button_addTitle_save_action (action
-                                   :handler (fn [e] (viewExecuteAddTitle))
+                                   :handler (fn [e] (handleExecuteAddTitle))
                                    :name (ClojureProject.lit_i18n/i18n :text_addTitle_button_save)))
 
 (def button_searchPublisher_clear_action (action
-                                   :handler (fn [e] (viewClearSearchPublisher))
+                                   :handler (fn [e] (handleClearSearchPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_searchPublisher_button_clear)))
 
 (def button_searchPublisher_search_action (action
-                                   :handler (fn [e] (viewExecuteSearchPublisher))
+                                   :handler (fn [e] (handleExecuteSearchPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_searchPublisher_button_search)))
 
 (def button_addPublisher_clear_action (action
-                                   :handler (fn [e] (viewClearAddPublisher))
+                                   :handler (fn [e] (handleClearAddPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_addPublisher_button_clear)))
 
 (def button_addPublisher_save_action (action
-                                   :handler (fn [e] (viewExecuteAddPublisher))
+                                   :handler (fn [e] (handleExecuteAddPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_addPublisher_button_save)))
 
 (def button_modifyTitle_save_action (action
-                                   :handler (fn [e] ())
+                                   :handler (fn [e] (handleExecuteModificateTitle))
                                    :name (ClojureProject.lit_i18n/i18n :text_modifyTitle_button_save)))
 
 (def button_modifyPublisher_save_action (action
-                                   :handler (fn [e] ())
+                                   :handler (fn [e] (handleExecuteModificatePublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_modifyPublisher_button_save)))
+
+(def button_deleteTitle_action (action
+                                   :handler (fn [e] (handleExecuteDeleteTitle))
+                                   :name (ClojureProject.lit_i18n/i18n :text_deleteTitle_button)))
+
+(def button_deletePublisher_action (action
+                                   :handler (fn [e] (handleExecuteDeletePublisher))
+                                   :name (ClojureProject.lit_i18n/i18n :text_deletePublisher_button)))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MENU ACTIONS
@@ -161,15 +188,12 @@
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_config_tooltip)))
 
 (def menubar_database_item_connect_action (action
-                    :handler (fn [e] (ClojureProject.lit_control/controlConnectDatabase (config field_database_host :text)
-                                                                                        (config field_database_name :text)
-                                                                                        (config field_database_username :text)
-                                                                                        (config field_database_password :text)))
+                    :handler (fn [e] (handleConnectDatabase))
                     :name (ClojureProject.lit_i18n/i18n :text_menubar_database_item_connect)
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_connect_tooltip)))
 
 (def menubar_database_item_disconnect_action (action
-                    :handler (fn [e] (ClojureProject.lit_control/controlDisconnectDatabase))
+                    :handler (fn [e] (handleDisconnectDatabase))
                     :name (ClojureProject.lit_i18n/i18n :text_menubar_database_item_disconnect)
                     :tip  (ClojureProject.lit_i18n/i18n :text_menubar_database_item_disconnect_tooltip)))
 
@@ -206,7 +230,6 @@
                                         menubar_operations_item_addTitle_action
                                         menubar_operations_item_searchPublisher_action
                                         menubar_operations_item_addPublisher_action])]))
-
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DATABASE CONFIGURATION PANEL
@@ -257,7 +280,12 @@
                                              :rows [["01" "Alexander Nadler"]
                                                     ["02" "Julian Rossbach"]]])))
 
-(def searchTitle_panel (top-bottom-split searchTitle_search_panel searchTitle_search_table))
+(def searchTitle_result_panel (grid-panel
+                                :columns 1 
+                                :items [searchTitle_search_table
+                                        (button :action button_deleteTitle_action)]))
+
+(def searchTitle_panel (top-bottom-split searchTitle_search_panel searchTitle_result_panel))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH PUBLISHER PANEL
@@ -281,7 +309,12 @@
                                              :rows [["01" "Alexander Nadler"]
                                                     ["02" "Julian Rossbach"]]])))
 
-(def searchPublisher_panel (top-bottom-split searchPublisher_search_panel searchPublisher_search_table))
+(def searchPublisher_result_panel (grid-panel
+                                    :columns 1 
+                                    :items [searchPublisher_search_table
+                                            (button :action button_deletePublisher_action)]))
+
+(def searchPublisher_panel (top-bottom-split searchPublisher_search_panel searchPublisher_result_panel))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; ADD TITLE PANEL
@@ -341,6 +374,10 @@
                                    :align :right
                                    :items [(button :action button_modifyTitle_save_action)])]))
 
+(def frame_modifyTitle (frame :title (ClojureProject.lit_i18n/i18n :text_modifyTitle_frame_title)
+                              :size [640 :by 480]
+                              :content modifyTitle_panel))
+
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MODIFY PUBLISHER PANEL / FRAME
 
@@ -354,6 +391,10 @@
                                      (flow-panel
                                        :align :right
                                        :items [(button :action button_modifyPublisher_save_action)])]))
+
+(def frame_modifyPublisher (frame :title (ClojureProject.lit_i18n/i18n :text_modifyTitle_frame_title)
+                                  :size [640 :by 480]
+                                  :content modifyPublisher_panel))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MAIN FRAME

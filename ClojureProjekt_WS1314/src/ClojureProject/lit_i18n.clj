@@ -66,7 +66,10 @@
    
    :text_modifyPublisher_frame_title "Verlag bearbeiten"
    :text_modifyPublisher_name "Name"
-   :text_modifypublisher_button_save "Speichern"})
+   :text_modifypublisher_button_save "Speichern"
+   
+   :text_deleteTitle_button ""
+   :text_deletePublisher_button ""})
 
 (def ^:private text (atom default))
 
