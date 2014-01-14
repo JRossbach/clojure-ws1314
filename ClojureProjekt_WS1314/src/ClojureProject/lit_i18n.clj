@@ -62,14 +62,16 @@
    :text_modifyTitle_isbn "ISBN"
    :text_modifyTitle_author "Autor"
    :text_modifyTitle_publisher "Verlag"
+   :text_modifyTitle_button "Bearbeiten"
    :text_modifyTitle_button_save "Speichern"
    
    :text_modifyPublisher_frame_title "Verlag bearbeiten"
    :text_modifyPublisher_name "Name"
+   :text_modifyPublisher_button "Bearbeiten"
    :text_modifypublisher_button_save "Speichern"
    
-   :text_deleteTitle_button ""
-   :text_deletePublisher_button ""})
+   :text_deleteTitle_button "Löschen"
+   :text_deletePublisher_button "Löschen"})
 
 (def ^:private text (atom default))
 
