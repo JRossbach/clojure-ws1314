@@ -48,8 +48,8 @@
   
   ([conditions] (select title (where {:isbn [like (get conditions :isbn)]
                                       :name [like (get conditions :name)]
-                                      :author [like (get conditions :author)]}))
-                (order :name :ASC)))
+                                      :author [like (get conditions :author)]})
+                (order :name :ASC))))
 
 (defn selectPublisher
   "Selects a number of publishers from the database"
