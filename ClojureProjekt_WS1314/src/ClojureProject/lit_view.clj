@@ -116,15 +116,17 @@
 (defn handleExecuteSearchPublisher []
   (ClojureProject.lit_control/executeSearchPublisher [(config field_searchPublisher_name :text)]))
 
-(defn handleExecuteModificateTitle [])
+(defn handleExecuteModificateTitle [] ())
 
-(defn handleExecuteModificatePublisher [])
+(defn handleExecuteModificatePublisher [] ())
 
-(defn handleExecuteDeleteTitle [])
+(defn handleExecuteDeleteTitle [] ())
 
-(defn handleExecuteDeletePublisher [])
+(defn handleExecuteDeletePublisher [] ())
 
-(listen searchTitle_search_table :selection (fn [e] (println "PENIS")))
+(defn testhandler [] (println "das ist ein test"));
+
+;(listen searchTitle_search_table :selection (fn [e] (println "PENIS")))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
@@ -277,11 +279,10 @@
                                                  (button :action button_searchTitle_search_action)])]))
 
 (def searchTitle_search_table (scrollable (table 
-                                     :model [
-                                             :handler
-                                             :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
-                                             :rows [["01" "Alexander Nadler"]
-                                                    ["02" "Julian Rossbach"]]])))
+                                            :model [
+                                                    :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
+                                                    :rows [["01" "Alexander Nadler"]
+                                                           ["02" "Julian Rossbach"]]])))
 
 (def searchTitle_result_panel (grid-panel
                                 :columns 1 
@@ -307,10 +308,10 @@
                                                  (button :action button_searchPublisher_search_action)])]))
 
 (def searchPublisher_search_table (scrollable (table 
-                                     :model [
-                                             :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
-                                             :rows [["01" "Alexander Nadler"]
-                                                    ["02" "Julian Rossbach"]]])))
+                                                :model [
+                                                        :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
+                                                        :rows [["01" "Alexander Nadler"]
+                                                               ["02" "Julian Rossbach"]]])))
 
 (def searchPublisher_result_panel (grid-panel
                                     :columns 1 
