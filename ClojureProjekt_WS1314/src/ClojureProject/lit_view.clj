@@ -11,6 +11,9 @@
          '[ClojureProject.lit_control :refer :all])
 
 (use '[seesaw.core])
+
+(use '[seesaw.table])
+
 (use '[seesaw.dev])
             
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +26,7 @@
 (declare field_database_password)
 
 (declare searchTitle_search_panel)
-(declare searchPublisher_result_panel)
+(declare searchTitle_result_panel)
 (declare searchTitle_search_table)
 (declare searchTitle_panel)
 (declare field_searchTitle_name)
@@ -85,27 +88,17 @@
   (config! field_searchTitle_author :text "")
   (config! field_searchTitle_publisher :text ""))
 
-(defn handleClearSearchPublisher []
-  (config! field_searchPublisher_name :text ""))
-
 (defn handleClearAddTitle []
   (config! field_addTitle_name :text "")
   (config! field_addTitle_isbn :text "")
   (config! field_addTitle_author :text "")
   (config! field_addTitle_publisher :text ""))
 
-(defn handleClearAddPublisher []
-  (config! field_addPublisher_name :text ""))
-
-
 (defn handleExecuteAddTitle []
-  (ClojureProject.lit_control/executeAddTitle [(config field_addTitle_name :text)
-                                               (config field_addTitle_isbn :text)
-                                               (config field_addTitle_author :text)
-                                               (config field_addTitle_publisher :text)]))
-
-(defn handleExecuteAddPublisher []
-  (ClojureProject.lit_control/executeAddPublisher [(config field_addPublisher_name :text)]))
+  (ClojureProject.lit_control/executeAddTitle [:name (str (config field_addTitle_name :text))
+                                               :isbn (str (config field_addTitle_isbn :text))
+                                               :author (str (config field_addTitle_author :text))
+                                               :publisher_id (str (config field_addTitle_publisher :text))]))
 
 (defn handleExecuteSearchTitle []
   (ClojureProject.lit_control/executeSearchTitle {:name (str (config field_searchTitle_name :text))
@@ -113,20 +106,29 @@
                                                   :author (str (config field_searchTitle_author :text))
                                                   :publisher_id (str (config field_searchTitle_publisher :text))}))
 
+(defn handleClearSearchPublisher []
+  (config! field_searchPublisher_name :text ""))
+
+(defn handleClearAddPublisher []
+  (config! field_addPublisher_name :text ""))
+
+(defn handleExecuteAddPublisher []
+  (ClojureProject.lit_control/executeAddPublisher [(config field_addPublisher_name :text)]))
+
 (defn handleExecuteSearchPublisher []
   (ClojureProject.lit_control/executeSearchPublisher [(config field_searchPublisher_name :text)]))
 
-(defn handleExecuteModificateTitle [] ())
+(defn handleModifyTitle [] (println (value-at searchTitle_search_table (selection searchTitle_search_table))))
 
-(defn handleExecuteModificatePublisher [] ())
+(defn handleModifyPublisher [] (println (value-at searchPublisher_search_table (selection searchPublisher_search_table))))
+
+(defn handleExecuteModifyTitle [] ())
+
+(defn handleExecuteModifyPublisher [] ())
 
 (defn handleExecuteDeleteTitle [] ())
 
 (defn handleExecuteDeletePublisher [] ())
-
-(defn testhandler [] (println "das ist ein test"));
-
-;(listen searchTitle_search_table :selection (fn [e] (println "PENIS")))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
@@ -167,12 +169,20 @@
                                    :handler (fn [e] (handleExecuteAddPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_addPublisher_button_save)))
 
+(def button_modifyTitle_action (action
+                                   :handler (fn [e] (handleModifyTitle))
+                                   :name (ClojureProject.lit_i18n/i18n :text_modifyTitle_button)))
+
 (def button_modifyTitle_save_action (action
-                                   :handler (fn [e] (handleExecuteModificateTitle))
+                                   :handler (fn [e] (handleExecuteModifyTitle))
                                    :name (ClojureProject.lit_i18n/i18n :text_modifyTitle_button_save)))
 
+(def button_modifyPublisher_action (action
+                                   :handler (fn [e] (handleModifyPublisher))
+                                   :name (ClojureProject.lit_i18n/i18n :text_modifyPublisher_button)))
+
 (def button_modifyPublisher_save_action (action
-                                   :handler (fn [e] (handleExecuteModificatePublisher))
+                                   :handler (fn [e] (handleExecuteModifyPublisher))
                                    :name (ClojureProject.lit_i18n/i18n :text_modifyPublisher_button_save)))
 
 (def button_deleteTitle_action (action
@@ -278,18 +288,19 @@
                                          :items [(button :action button_searchTitle_clear_action)
                                                  (button :action button_searchTitle_search_action)])]))
 
-(def searchTitle_search_table (scrollable (table 
-                                            :model [
-                                                    :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
-                                                    :rows [["01" "Alexander Nadler"]
-                                                           ["02" "Julian Rossbach"]]])))
+(def searchTitle_search_table (table 
+                                :model [:columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
+                                        :rows [["01" "Alexander Nadler"]
+                                               ["02" "Julian Rossbach"]]]))
 
 (def searchTitle_result_panel (grid-panel
                                 :columns 1 
-                                :items [searchTitle_search_table
-                                        (button :action button_deleteTitle_action)]))
+                                :items [(flow-panel :items [searchTitle_search_table])
+                                        (flow-panel :align :right
+                                                    :items [(button :action button_modifyTitle_action)
+                                                            (button :action button_deleteTitle_action)])]))
 
-(def searchTitle_panel (top-bottom-split searchTitle_search_panel searchTitle_result_panel))
+(def searchTitle_panel (scrollable (top-bottom-split searchTitle_search_panel searchTitle_result_panel)))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH PUBLISHER PANEL
@@ -307,16 +318,17 @@
                                          :items [(button :action button_searchPublisher_clear_action)
                                                  (button :action button_searchPublisher_search_action)])]))
 
-(def searchPublisher_search_table (scrollable (table 
-                                                :model [
-                                                        :columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
-                                                        :rows [["01" "Alexander Nadler"]
-                                                               ["02" "Julian Rossbach"]]])))
+(def searchPublisher_search_table (table 
+                                    :model [:columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
+                                            :rows [["01" "Alexander Nadler"]
+                                                   ["02" "Julian Rossbach"]]]))
 
 (def searchPublisher_result_panel (grid-panel
                                     :columns 1 
-                                    :items [searchPublisher_search_table
-                                            (button :action button_deletePublisher_action)]))
+                                    :items [(flow-panel :items [searchPublisher_search_table])
+                                            (flow-panel :align :right
+                                                        :items [(button :action button_modifyPublisher_action)
+                                                                (button :action button_deletePublisher_action)])]))
 
 (def searchPublisher_panel (top-bottom-split searchPublisher_search_panel searchPublisher_result_panel))
 
