@@ -45,9 +45,9 @@
   "Selects a number of titles from the database"    
   ([] (select title (order :name :ASC)))  
   ([conditions] (select title 
-                        (where (or {:isbn [like (get conditions :isbn)]}
-                                   {:name [like (get conditions :name)]}
-                                   {:author [like (get conditions :author)]}))
+                        (where (and {:isbn [like (get conditions :isbn)]}
+                                    {:name [like (get conditions :name)]}
+                                    {:author [like (get conditions :author)]}))
                         (order :name :ASC))))
 
 (defn selectPublisher

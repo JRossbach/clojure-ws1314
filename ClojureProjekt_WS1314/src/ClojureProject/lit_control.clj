@@ -29,14 +29,14 @@
 
 (defn executeSearchTitle 
   ""
-  [searchTitleMap] (ClojureProject.lit_data/selectTitle {:name (str (get searchTitleMap :name))
-                                                         :isbn (str (get searchTitleMap :isbn))
-                                                         :author (str (get searchTitleMap :author))
+  [searchTitleMap] (ClojureProject.lit_data/selectTitle {:name (str "%" (get searchTitleMap :name) "%")
+                                                         :isbn (str "%" (get searchTitleMap :isbn) "%")
+                                                         :author (str "%" (get searchTitleMap :author) "%")
                                                          :publisher_id (str (get searchTitleMap :publisher_id))}))
 
 (defn executeSearchPublisher 
   ""
-  [searchPublisherMap] (ClojureProject.lit_data/selectPublisher  {:name (str (get searchTitleMap :name))}))
+  [searchPublisherMap] (ClojureProject.lit_data/selectPublisher  {:name (str (get searchPublisherMap :name))}))
 
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
