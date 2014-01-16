@@ -15,7 +15,10 @@
 
 (defn controlConnectDatabase 
   ""
-  [host db user password] (ClojureProject.lit_data/connectDatabase {:host host :db db :user user :password password}))
+  [host db user password] (ClojureProject.lit_data/connectDatabase {:host host 
+                                                                    :db db 
+                                                                    :user user 
+                                                                    :password password}))
 
 (defn controlDisconnectDatabase 
   ""
@@ -33,7 +36,7 @@
 
 (defn executeSearchPublisher 
   ""
-  [searchPublisherVector] (println (ClojureProject.lit_data/selectPublisher)))
+  [searchPublisherMap] (ClojureProject.lit_data/selectPublisher  {:name (str (get searchTitleMap :name))}))
 
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
