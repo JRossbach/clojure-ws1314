@@ -42,21 +42,17 @@
 ; DATABASE SELECT
 
 (defn selectTitle
-  "Selects a number of titles from the database"  
-  
-  ([] (select title (order :name :ASC)))
-  
-  ([conditions] (println conditions)
-                (select title (where (or {:isbn [like (get conditions :isbn)]}
-                                        {:name [like (get conditions :name)]}
-                                        {:author [like (get conditions :author)]}))
-                                 (order :name :ASC))))
+  "Selects a number of titles from the database"    
+  ([] (select title (order :name :ASC)))  
+  ([conditions] (select title 
+                        (where (or {:isbn [like (get conditions :isbn)]}
+                                   {:name [like (get conditions :name)]}
+                                   {:author [like (get conditions :author)]}))
+                        (order :name :ASC))))
 
 (defn selectPublisher
-  "Selects a number of publishers from the database"
-  
-  ([] (select publisher (order :name :ASC)))
-  
+  "Selects a number of publishers from the database"  
+  ([] (select publisher (order :name :ASC)))  
   ([conditions] (select publisher (where {:name [like (get conditions :name)]}) (order :name :ASC))))
 
 ; -------------------------------------------------------------------------------------

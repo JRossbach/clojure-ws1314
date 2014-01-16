@@ -11,9 +11,7 @@
          '[ClojureProject.lit_control :refer :all])
 
 (use '[seesaw.core])
-
 (use '[seesaw.table])
-
 (use '[seesaw.dev])
             
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -61,8 +59,14 @@
 (declare frame_modifyTitle)
 (declare frame_modifyPublisher)
 
-(declare frame_menu)
+(declare menu_frame_main)
 (declare frame_main)
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; SET VIEW ITEMS
+
+(defn setTitleResultTableModel [resultVector]
+  (println "RESULT: " resultVector))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; HANDLER
@@ -94,17 +98,23 @@
   (config! field_addTitle_author :text "")
   (config! field_addTitle_publisher :text ""))
 
-(defn handleExecuteAddTitle []
-  (ClojureProject.lit_control/executeAddTitle [:name (str (config field_addTitle_name :text))
-                                               :isbn (str (config field_addTitle_isbn :text))
-                                               :author (str (config field_addTitle_author :text))
-                                               :publisher_id (str (config field_addTitle_publisher :text))]))
-
 (defn handleExecuteSearchTitle []
-  (ClojureProject.lit_control/executeSearchTitle {:name (str (config field_searchTitle_name :text))
-                                                  :isbn (str (config field_searchTitle_isbn :text))
-                                                  :author (str (config field_searchTitle_author :text))
-                                                  :publisher_id (str (config field_searchTitle_publisher :text))}))
+  (setTitleResultTableModel (ClojureProject.lit_control/executeSearchTitle {:name (config field_searchTitle_name :text)
+                                                               :isbn (config field_searchTitle_isbn :text)
+                                                               :author (config field_searchTitle_author :text)
+                                                               :publisher_id (config field_searchTitle_publisher :text)})))
+
+(defn handleExecuteAddTitle []
+  (ClojureProject.lit_control/executeAddTitle {:name (config field_addTitle_name :text)
+                                               :isbn (config field_addTitle_isbn :text)
+                                               :author (config field_addTitle_author :text)
+                                               :publisher_id (config field_addTitle_publisher :text)}))
+
+(defn handleModifyTitle [] (println (value-at searchTitle_search_table (selection searchTitle_search_table))))
+
+(defn handleExecuteModifyTitle [] ())
+
+(defn handleExecuteDeleteTitle [] ())
 
 (defn handleClearSearchPublisher []
   (config! field_searchPublisher_name :text ""))
@@ -113,20 +123,14 @@
   (config! field_addPublisher_name :text ""))
 
 (defn handleExecuteAddPublisher []
-  (ClojureProject.lit_control/executeAddPublisher [(config field_addPublisher_name :text)]))
+  (ClojureProject.lit_control/executeAddPublisher {:name (config field_addPublisher_name :text)}))
 
 (defn handleExecuteSearchPublisher []
-  (ClojureProject.lit_control/executeSearchPublisher [(config field_searchPublisher_name :text)]))
-
-(defn handleModifyTitle [] (println (value-at searchTitle_search_table (selection searchTitle_search_table))))
+  (ClojureProject.lit_control/executeSearchPublisher {:name (config field_searchPublisher_name :text)}))
 
 (defn handleModifyPublisher [] (println (value-at searchPublisher_search_table (selection searchPublisher_search_table))))
 
-(defn handleExecuteModifyTitle [] ())
-
 (defn handleExecuteModifyPublisher [] ())
-
-(defn handleExecuteDeleteTitle [] ())
 
 (defn handleExecuteDeletePublisher [] ())
 
@@ -234,7 +238,7 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MENU
 
-(def frame_menu (menubar :items 
+(def menu_frame_main (menubar :items 
                          [(menu :text (ClojureProject.lit_i18n/i18n :text_menubar_database_main_title) 
                                 :items [menubar_database_item_config_action
                                         menubar_database_item_connect_action
@@ -417,7 +421,7 @@
 
 (def frame_main (frame :title (ClojureProject.lit_i18n/i18n :text_frame_main_title)
                        :size [640 :by 480]
-                       :menubar frame_menu
+                       :menubar menu_frame_main
                        :content searchTitle_panel))
                        ;:on-close :exit))
 

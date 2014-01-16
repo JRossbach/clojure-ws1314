@@ -3,6 +3,7 @@
 ;  (:require [ClojureProject.lit_data :as data]))
 
 (ns ClojureProject.lit_control)
+
 (require '[ClojureProject.lit_data :refer :all])
 
 ; -------------------------------------------------------------------------------------
@@ -25,7 +26,10 @@
 
 (defn executeSearchTitle 
   ""
-  [searchTitleMap] (println (get (ClojureProject.lit_data/selectTitle) 1)))
+  [searchTitleMap] (ClojureProject.lit_data/selectTitle {:name (str (get searchTitleMap :name))
+                                                         :isbn (str (get searchTitleMap :isbn))
+                                                         :author (str (get searchTitleMap :author))
+                                                         :publisher_id (str (get searchTitleMap :publisher_id))}))
 
 (defn executeSearchPublisher 
   ""
