@@ -71,7 +71,9 @@
    :text_modifypublisher_button_save "Speichern"
    
    :text_deleteTitle_button "Löschen"
-   :text_deletePublisher_button "Löschen"})
+   :text_deletePublisher_button "Löschen"
+   
+   :text_table_noResult "No results..."})
 
 (def ^:private text (atom default))
 

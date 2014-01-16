@@ -17,6 +17,13 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DECLARETION
 
+(declare setTitleResultTableModel)
+(declare setPublisherResultTableModel)
+
+(declare setResultTableModel)
+(declare getResultTableHead)
+(declare getResultTableBody)
+
 (declare database_panel)
 (declare field_database_host)
 (declare field_database_name)
@@ -63,10 +70,46 @@
 (declare frame_main)
 
 ;-------------------------------------------------------------------------------------------------------------------------------
-; SET VIEW ITEMS
+; SET ITEM CONTENTS
 
-(defn setTitleResultTableModel [resultVector]
-  (println "RESULT: " resultVector))
+(defn setTitleResultTableModel 
+  [result]
+  (cond (empty? result) (setResultTableModel searchTitle_search_table)
+        :else (setResultTableModel searchTitle_search_table result)))
+
+(defn setPublisherResultTableModel 
+  [result]
+  (cond (empty? result) (setResultTableModel searchPublisher_search_table)
+        :else (setResultTableModel searchPublisher_search_table result)))
+
+(defn setResultTableModel 
+  ([table] (config! table 
+                    :model [:columns [{:key :text, :text ""}] 
+                            :rows [[(ClojureProject.lit_i18n/i18n :text_table_noResult)]]]))
+  ([table result] (config! table 
+                           :model [:columns (getResultTableHead result) 
+                                   :rows (getResultTableBody result)])))
+
+(defn getResultTableHead22 
+  [result] (doseq [[key text] (map list (keys (get result 0)) (keys (get result 0)))]
+                                   (key (str text))))
+
+(defn getResultTableHead23 
+  [result] (map list 
+                (keys (get result 0)) 
+                (apply str (keys (get result 0)))))
+
+
+(defn getResultTableHead 
+  [result] [{:key :author, :text "Author"}
+            {:key :name, :text "Name"}
+            {:key :publisher_id, :text "PublisherID"}
+            {:key :isbn, :text "ISBN"}
+            {:key :id, :text "ID"}])
+
+(defn getResultTableBody 
+  [result] (vec (for [record result] 
+                  (vec (vals record)))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; HANDLER
@@ -100,9 +143,9 @@
 
 (defn handleExecuteSearchTitle []
   (setTitleResultTableModel (ClojureProject.lit_control/executeSearchTitle {:name (config field_searchTitle_name :text)
-                                                               :isbn (config field_searchTitle_isbn :text)
-                                                               :author (config field_searchTitle_author :text)
-                                                               :publisher_id (config field_searchTitle_publisher :text)})))
+                                                                            :isbn (config field_searchTitle_isbn :text)
+                                                                            :author (config field_searchTitle_author :text)
+                                                                            :publisher_id (config field_searchTitle_publisher :text)})))
 
 (defn handleExecuteAddTitle []
   (ClojureProject.lit_control/executeAddTitle {:name (config field_addTitle_name :text)
@@ -293,9 +336,8 @@
                                                  (button :action button_searchTitle_search_action)])]))
 
 (def searchTitle_search_table (table 
-                                :model [:columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
-                                        :rows [["01" "Alexander Nadler"]
-                                               ["02" "Julian Rossbach"]]]))
+                                :model [:columns [{:key :id, :text "-"}] 
+                                        :rows [[" " " "]]]))
 
 (def searchTitle_result_panel (grid-panel
                                 :columns 1 
