@@ -57,7 +57,8 @@
    :text_addPublisher_button_clear "Zurücksetzen"
    :text_addPublisher_button_save "Speichern"
    
-   :text_modifyTitle_frame_title "Literatur bearbeiten"
+   :text_modifyTitle_border "Literatur bearbeiten"
+   :text_modifyTitle_id "ID"
    :text_modifyTitle_name "Name"
    :text_modifyTitle_isbn "ISBN"
    :text_modifyTitle_author "Autor"
@@ -65,7 +66,8 @@
    :text_modifyTitle_button "Bearbeiten"
    :text_modifyTitle_button_save "Speichern"
    
-   :text_modifyPublisher_frame_title "Verlag bearbeiten"
+   :text_modifyPublisher_border "Verlag bearbeiten"
+   :text_modifyPublisher_id "ID"
    :text_modifyPublisher_name "Name"
    :text_modifyPublisher_button "Bearbeiten"
    :text_modifypublisher_button_save "Speichern"
