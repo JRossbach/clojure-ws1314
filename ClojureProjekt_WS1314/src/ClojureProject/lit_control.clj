@@ -1,6 +1,7 @@
 ; -------------------------------------------------------------------------------------
 (ns ClojureProject.lit_control
-  (:require [ClojureProject.lit_data :as data]))
+  (:require [ClojureProject.lit_data :as data]
+            [clojure.tools.logging :as log]))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE OPERATIONS
@@ -11,7 +12,7 @@
 
 (defn controlConnectDatabase 
   "opens a connection to a database with the given connection data"
-  [host db user password] 
+  [host db user password]
   (data/connectDatabase {:host host 
                          :db db 
                          :user user 

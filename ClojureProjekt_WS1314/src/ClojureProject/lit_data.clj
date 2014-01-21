@@ -1,8 +1,9 @@
 ;This class is responsible for den database connection and CRUD-methods----------------
 (ns ClojureProject.lit_data
-  (:require [korma.core :refer :all])
-  (:require [korma.db :refer :all])
-  (:require [clojure.string :as str]))
+  (:require [korma.core :refer :all]
+            [korma.db :refer :all]
+            [clojure.string :as str] 
+            [clojure.tools.logging :as log]))
 
 ; -------------------------------------------------------------------------------------
 ; DECLARETIONS

@@ -3,6 +3,7 @@
  (:require [seesaw.core :refer :all]
            [seesaw.table :refer :all]
            [seesaw.dev :refer :all]
+           [clojure.tools.logging :as log]
            [ClojureProject.lit_i18n :as label]
            [ClojureProject.lit_control :as control]))
             
@@ -553,4 +554,5 @@
                        ;:on-close :exit))
 
 (native!) ; native os ui
-(-> frame_main pack! show!)                                                  
+(-> frame_main pack! show!)    
+(log/info "Logging")
