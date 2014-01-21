@@ -36,7 +36,7 @@
 (defn executeSearchPublisher 
   ""
   [searchPublisherMap] 
-  (data/selectPublisher {:name (str (get searchPublisherMap :name))}))
+  (data/selectPublisher {:name (str "%" (get searchPublisherMap :name) "%")}))
 
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS

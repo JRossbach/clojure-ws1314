@@ -84,9 +84,9 @@
 
 (defn updatePublisher
   "Updates a publisher in the database"
-  [publisher] (update publisher
-                      (set-fields {:name (get publisher :name)})                        
-                      (where {:id [= (get publisher :id)]})))
+  [publisherMap] (update publisher
+                         (set-fields {:name (get publisherMap :name)})                        
+                         (where {:id [= (get publisherMap :id)]})))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE DELETE
