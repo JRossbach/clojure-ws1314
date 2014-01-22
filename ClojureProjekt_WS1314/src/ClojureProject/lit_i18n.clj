@@ -70,7 +70,7 @@
    :text_modifyPublisher_id "ID"
    :text_modifyPublisher_name "Name"
    :text_modifyPublisher_button "Bearbeiten"
-   :text_modifypublisher_button_save "Speichern"
+   :text_modifyPublisher_button_save "Speichern"
    
    :text_deleteTitle_button "Löschen"
    :text_deletePublisher_button "Löschen"

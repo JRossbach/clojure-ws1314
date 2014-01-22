@@ -1,8 +1,9 @@
 ;This class is responsible for den database connection and CRUD-methods----------------
 (ns ClojureProject.lit_data
-  (:require [korma.core :refer :all])
-  (:require [korma.db :refer :all])
-  (:require [clojure.string :as str]))
+  (:require [korma.core :refer :all]
+            [korma.db :refer :all]
+            [clojure.string :as str] 
+            [clojure.tools.logging :as log]))
 
 ; -------------------------------------------------------------------------------------
 ; DECLARETIONS
@@ -84,9 +85,9 @@
 
 (defn updatePublisher
   "Updates a publisher in the database"
-  [publisher] (update publisher
-                      (set-fields {:name (get publisher :name)})                        
-                      (where {:id [= (get publisher :id)]})))
+  [publisherMap] (update publisher
+                         (set-fields {:name (get publisherMap :name)})                        
+                         (where {:id [= (get publisherMap :id)]})))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE DELETE

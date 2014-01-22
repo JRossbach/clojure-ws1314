@@ -3,6 +3,7 @@
  (:require [seesaw.core :refer :all]
            [seesaw.table :refer :all]
            [seesaw.dev :refer :all]
+           [clojure.tools.logging :as log]
            [ClojureProject.lit_i18n :as label]
            [ClojureProject.lit_control :as control]))
 
@@ -13,7 +14,7 @@
 (declare setPublisherResultTableModel)
 
 (declare setResultTableModel)
-(declare getResultTableHead)
+(declare getTitleResultTableHead)
 (declare getResultTableBody)
 
 (declare database_panel)
@@ -66,37 +67,52 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SET ITEM CONTENTS
 
+(declare setTitResultTableModel)
+(declare setPubResultTableModel)
 (defn setTitleResultTableModel 
   "Fills the title search result table with the given result map"
   [result]
-  (cond (empty? result) (setResultTableModel searchTitle_search_table)
-        :else (setResultTableModel searchTitle_search_table result)))
+  (cond (empty? result) (setTitResultTableModel searchTitle_search_table)
+        :else (setTitResultTableModel searchTitle_search_table result)))
 
 (defn setPublisherResultTableModel 
   "Fills the publisher search result table with the given result map"
   [result]
-  (cond (empty? result) (setResultTableModel searchPublisher_search_table)
-        :else (setResultTableModel searchPublisher_search_table result)))
+  (cond (empty? result) (setPubResultTableModel searchPublisher_search_table)
+        :else (setPubResultTableModel searchPublisher_search_table result)))
 
-(defn setResultTableModel 
+(defn setTitResultTableModel 
   ([table] (config! table 
                     :model [:columns [{:key :text, :text ""}] 
                             :rows [[(label/i18n :text_table_noResult)]]]))
   ([table result] (config! table 
-                           :model [:columns (getResultTableHead result) 
+                           :model [:columns (getTitleResultTableHead result) 
                                    :rows (getResultTableBody result)])))
 
-(defn getResultTableHead22 
+(declare getPublisherResultTableHead)
+(defn setPubResultTableModel 
+  ([table] (config! table 
+                    :model [:columns [{:key :text, :text ""}] 
+                            :rows [[(label/i18n :text_table_noResult)]]]))
+  ([table result] (config! table 
+                           :model [:columns (getPublisherResultTableHead result) 
+                                   :rows (getResultTableBody result)])))
+
+(defn getTitleResultTableHead22 
   [result] (doseq [[key text] (map list (keys (get result 0)) (keys (get result 0)))]
                                    (key (str text))))
 
-(defn getResultTableHead23 
+(defn getTitleResultTableHead23 
   [result] (map list 
                 (keys (get result 0)) 
                 (apply str (keys (get result 0)))))
 
 
-(defn getResultTableHead 
+(defn getPublisherResultTableHead 
+  [result] [{:key :name, :text "Name"}
+            {:key :id, :text "ID"}])
+
+(defn getTitleResultTableHead 
   [result] [{:key :publisher_id, :text "PublisherID"}
             {:key :author, :text "Author"}
             {:key :isbn, :text "ISBN"}
@@ -214,7 +230,7 @@
 (defn handleExecuteSearchPublisher 
   "Searches a publisher in the database for the given conditions"
   []
-  (control/executeSearchPublisher {:name (config field_searchPublisher_name :text)}))
+  (setPublisherResultTableModel (control/executeSearchPublisher {:name (config field_searchPublisher_name :text)})))
 
 (defn handleExecuteAddPublisher 
   "Adds a new publisher to the database"
@@ -224,17 +240,24 @@
 (defn handleModifyPublisher 
   "Opens the modify publisher window with the data from the selected publisher"
   [] 
-  (println (value-at searchPublisher_search_table (selection searchPublisher_search_table))))
+  (let [publisher (value-at searchPublisher_search_table (selection searchPublisher_search_table))]
+    (config! field_modifyPublisher_id :text (get publisher :id))
+    (config! field_modifyPublisher_name :text (get publisher :name))
+    (switch modifyPublisher_panel)))
 
 (defn handleExecuteModifyPublisher 
   "Saves the modified publisher in the database"
-  [] 
-  ())
+  []
+  (control/executeModifyPublisher {:id (config field_modifyPublisher_id :text)
+                                   :name (config field_modifyPublisher_name :text)})
+  (switch searchPublisher_panel)
+  (handleExecuteSearchPublisher))
 
 (defn handleExecuteDeletePublisher 
   "Deletes the selected publisher from the database"
   [] 
-  ())
+  (control/executeDeletePublisher (get (value-at searchPublisher_search_table (selection searchPublisher_search_table)) :id))
+  (handleExecuteSearchPublisher))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
@@ -290,6 +313,8 @@
 (def button_modifyPublisher_save_action (action
                                    :handler (fn [e] (handleExecuteModifyPublisher))
                                    :name (label/i18n :text_modifyPublisher_button_save)))
+
+(label/i18n :text_modifyPublisher_button_save)
 
 (def button_deleteTitle_action (action
                                    :handler (fn [e] (handleExecuteDeleteTitle))
@@ -478,7 +503,7 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MODIFY TITLE PANEL / FRAME
 
-(def field_modifyTitle_id (text))
+(def field_modifyTitle_id (text :editable? false))
 (def field_modifyTitle_name (text))
 (def field_modifyTitle_isbn (text))
 (def field_modifyTitle_author (text))
@@ -505,7 +530,7 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MODIFY PUBLISHER PANEL / FRAME
 
-(def field_modifyPublisher_id (text))
+(def field_modifyPublisher_id (text :editable? false))
 (def field_modifyPublisher_name (text))
 
 (def modifyPublisher_panel (grid-panel
@@ -529,4 +554,5 @@
                        ;:on-close :exit))
 
 (native!) ; native os ui
-(-> frame_main pack! show!)                                                  
+(-> frame_main pack! show!)    
+(log/info "Logging")
