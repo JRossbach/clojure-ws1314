@@ -5,7 +5,7 @@
            [seesaw.dev :refer :all]
            [ClojureProject.lit_i18n :as label]
            [ClojureProject.lit_control :as control]))
-            
+
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DECLARETION
 
