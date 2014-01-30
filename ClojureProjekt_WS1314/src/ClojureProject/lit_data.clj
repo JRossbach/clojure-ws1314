@@ -9,8 +9,8 @@
 ; DECLARETIONS
 
 ; declare entities
-(declare publisher)
 (declare title)
+(declare publisher)
 
 ; declare database
 (declare mySQLDatabase)

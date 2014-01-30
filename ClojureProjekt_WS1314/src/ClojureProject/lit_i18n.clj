@@ -87,19 +87,3 @@
   "Gets or sets the value for the supplied key."
   ([k] (k (deref text)))
   ([k v] (swap! text assoc k v)))
-
-(defn fmt
-  "Formats a string with a key and more arguments."
-  [k & more]
-  (apply format (i18n k) more))
-
-(defn di18n
-  "Returns a Delay instance with the value for the supplied key.
-Useful in (def)'ed expressions that evaluate too soon."
-  [k] (delay (k (deref text))))
-
-(defn dfmt
-  "Returns a Delay instance with a string formatted with a key and more
-arguments. Useful in (def)'ed expressions that evaluate too soon."
-  [k & more]
-  (delay (apply format (i18n k) more)))
