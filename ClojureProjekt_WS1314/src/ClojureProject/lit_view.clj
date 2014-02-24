@@ -65,6 +65,14 @@
 (declare frame_main)
 
 ;-------------------------------------------------------------------------------------------------------------------------------
+; MAKROS
+
+(defmacro writeErrorLog 
+  "Writes the an error log for the thrown exception"
+  [exception]
+  (log/error (str "caught exception: " (.getMessage exception) (.toString (.getStackTrace exception)))))
+
+;-------------------------------------------------------------------------------------------------------------------------------
 ; SET ITEM CONTENTS
 
 (declare setTitResultTableModel)
@@ -139,10 +147,12 @@
 (defn handleConnectDatabase 
   "Opens a database connection with the connection data from the database fields"
   []
-  (control/controlConnectDatabase (config field_database_host :text)
+  (try
+    (control/controlConnectDatabase (config field_database_host :text)
                                   (config field_database_name :text)
                                   (config field_database_username :text)
-                                  (config field_database_password :text)))
+                                  (config field_database_password :text))
+    (catch Exception e (writeErrorLog e))))
 
 (defn handleDisconnectDatabase 
   "Closes the actual active database connection"
@@ -168,24 +178,6 @@
   (config! field_addTitle_author :text "")
   (config! field_addTitle_publisher :text ""))
 
-(defn handleExecuteSearchTitle 
-  "Searches a title in the database for the given conditions"
-  []
-  (setTitleResultTableModel (control/executeSearchTitle {:name (config field_searchTitle_name :text)
-                                                         :isbn (config field_searchTitle_isbn :text)
-                                                         :author (config field_searchTitle_author :text)
-                                                         :publisher_id (config field_searchTitle_publisher :text)})))
-
-(defn handleExecuteAddTitle 
-  "Adds a new title to the database"
-  []
-  (control/executeAddTitle {:name (config field_addTitle_name :text)
-                            :isbn (config field_addTitle_isbn :text)
-                            :author (config field_addTitle_author :text)
-                            :publisher_id (config field_addTitle_publisher :text)})
-  (switch searchTitle_panel)
-  (handleExecuteSearchTitle))
-
 (defn handleModifyTitle 
   "Opens the modify title panel with the data from the selected title"
   [] 
@@ -197,22 +189,48 @@
     (config! field_modifyTitle_publisher :text (get title :publisher_id))
     (switch modifyTitle_panel)))
 
+(defn handleExecuteSearchTitle 
+  "Searches a title in the database for the given conditions"
+  []
+  (try
+    (setTitleResultTableModel (control/executeSearchTitle {:name (config field_searchTitle_name :text)
+                                                         :isbn (config field_searchTitle_isbn :text)
+                                                         :author (config field_searchTitle_author :text)
+                                                         :publisher_id (config field_searchTitle_publisher :text)}))
+    (catch Exception e (writeErrorLog e))))
+
+(defn handleExecuteAddTitle 
+  "Adds a new title to the database"
+  []
+  (try
+    ((control/executeAddTitle {:name (config field_addTitle_name :text)
+                            :isbn (config field_addTitle_isbn :text)
+                            :author (config field_addTitle_author :text)
+                            :publisher_id (config field_addTitle_publisher :text)})
+      (switch searchTitle_panel)
+      (handleExecuteSearchTitle))
+    (catch Exception e (writeErrorLog e))))
+
 (defn handleExecuteModifyTitle 
   "Saves the modified title in the database"
   [] 
-  (control/executeModifyTitle {:id (config field_modifyTitle_id :text)
-                               :name (config field_modifyTitle_name :text)
+  (try
+    ((control/executeModifyTitle {:id (config field_modifyTitle_id :text)
+                                  :name (config field_modifyTitle_name :text)
                                :isbn (config field_modifyTitle_isbn :text)
                                :author (config field_modifyTitle_author :text)
                                :publisher_id (config field_modifyTitle_publisher :text)})
-  (switch searchTitle_panel)
-  (handleExecuteSearchTitle))
+      (switch searchTitle_panel)
+      (handleExecuteSearchTitle))
+    (catch Exception e (writeErrorLog e))))
 
 (defn handleExecuteDeleteTitle 
   "Deletes the selected title from the database"
   [] 
-  (control/executeDeleteTitle (get (value-at searchTitle_search_table (selection searchTitle_search_table)) :id))
-  (handleExecuteSearchTitle))
+  (try
+    ((control/executeDeleteTitle (get (value-at searchTitle_search_table (selection searchTitle_search_table)) :id))
+      (handleExecuteSearchTitle))
+    (catch Exception e (writeErrorLog e))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; HANDLER PUBLISHER
@@ -227,16 +245,6 @@
   []
   (config! field_addPublisher_name :text ""))
 
-(defn handleExecuteSearchPublisher 
-  "Searches a publisher in the database for the given conditions"
-  []
-  (setPublisherResultTableModel (control/executeSearchPublisher {:name (config field_searchPublisher_name :text)})))
-
-(defn handleExecuteAddPublisher 
-  "Adds a new publisher to the database"
-  []
-  (control/executeAddPublisher {:name (config field_addPublisher_name :text)}))
-
 (defn handleModifyPublisher 
   "Opens the modify publisher window with the data from the selected publisher"
   [] 
@@ -245,19 +253,37 @@
     (config! field_modifyPublisher_name :text (get publisher :name))
     (switch modifyPublisher_panel)))
 
+(defn handleExecuteSearchPublisher 
+  "Searches a publisher in the database for the given conditions"
+  []
+  (try
+    (setPublisherResultTableModel (control/executeSearchPublisher {:name (config field_searchPublisher_name :text)}))
+    (catch Exception e (writeErrorLog e))))
+
+(defn handleExecuteAddPublisher 
+  "Adds a new publisher to the database"
+  []
+  (try
+    (control/executeAddPublisher {:name (config field_addPublisher_name :text)})
+    (catch Exception e (writeErrorLog e))))
+
 (defn handleExecuteModifyPublisher 
   "Saves the modified publisher in the database"
   []
-  (control/executeModifyPublisher {:id (config field_modifyPublisher_id :text)
-                                   :name (config field_modifyPublisher_name :text)})
-  (switch searchPublisher_panel)
-  (handleExecuteSearchPublisher))
+  (try
+    ((control/executeModifyPublisher {:id (config field_modifyPublisher_id :text)
+                                      :name (config field_modifyPublisher_name :text)})
+      (switch searchPublisher_panel)
+      (handleExecuteSearchPublisher))
+    (catch Exception e (writeErrorLog e))))
 
 (defn handleExecuteDeletePublisher 
   "Deletes the selected publisher from the database"
   [] 
-  (control/executeDeletePublisher (get (value-at searchPublisher_search_table (selection searchPublisher_search_table)) :id))
-  (handleExecuteSearchPublisher))
+  (try
+    ((control/executeDeletePublisher (get (value-at searchPublisher_search_table (selection searchPublisher_search_table)) :id))
+      (handleExecuteSearchPublisher))
+    (catch Exception e (writeErrorLog e))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
