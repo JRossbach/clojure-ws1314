@@ -23,8 +23,6 @@
 (declare field_database_username)
 (declare field_database_password)
 
-(declare searchTitle_search_panel)
-(declare searchTitle_result_panel)
 (declare searchTitle_search_table)
 (declare searchTitle_panel)
 (declare field_searchTitle_name)
@@ -32,8 +30,6 @@
 (declare field_searchTitle_author)
 (declare field_searchTitle_publisher)
 
-(declare searchPublisher_search_panel)
-(declare searchPublisher_result_panel)
 (declare searchPublisher_search_table)
 (declare searchPublisher_panel)
 (declare field_searchPublisher_name)
@@ -70,7 +66,8 @@
 (defmacro writeErrorLog 
   "Writes the an error log for the thrown exception"
   [exception]
-  (log/error (str "caught exception: " (.getMessage exception) (.toString (.getStackTrace exception)))))
+  ;(log/error (str "caught exception: " (.getMessage exception) (.toString (.getStackTrace exception)))))
+  )
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SET ITEM CONTENTS
@@ -78,13 +75,13 @@
 (declare setTitResultTableModel)
 (declare setPubResultTableModel)
 (defn setTitleResultTableModel 
-  "Fills the title search result table with the given result map"
+  "Fills the search title result table with the given result map"
   [result]
   (cond (empty? result) (setTitResultTableModel searchTitle_search_table)
         :else (setTitResultTableModel searchTitle_search_table result)))
 
 (defn setPublisherResultTableModel 
-  "Fills the publisher search result table with the given result map"
+  "Fills the search publisher result table with the given result map"
   [result]
   (cond (empty? result) (setPubResultTableModel searchPublisher_search_table)
         :else (setPubResultTableModel searchPublisher_search_table result)))
@@ -410,83 +407,55 @@
 (def field_database_username (text"root"))
 (def field_database_password (text ""))
 
-(def database_panel (grid-panel 
-                      :border (label/i18n :text_database_border)
-                      :columns 1
-                      :items [(grid-panel
-                                :columns 2
-                                :items [(label/i18n :text_database_host) field_database_host
-                                        (label/i18n :text_database_name) field_database_name
-                                        (label/i18n :text_database_username) field_database_username
-                                        (label/i18n :text_database_password) field_database_password])
-                              (flow-panel
-                                :align :right
-                                :items [(button :action button_database_save_action)])]))
+(def database_panel (vertical-panel :border (label/i18n :text_database_border)
+                                    :items [(grid-panel :columns 2
+                                                        :items [(label/i18n :text_database_host) field_database_host
+                                                                (label/i18n :text_database_name) field_database_name
+                                                                (label/i18n :text_database_username) field_database_username
+                                                                (label/i18n :text_database_password) field_database_password])
+                                            (flow-panel :align :right
+                                                        :items [(button :action button_database_save_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH TITLE PANEL
 
 (def field_searchTitle_name (text))
+(config! field_searchTitle_name :height 50)
 (def field_searchTitle_isbn (text))
 (def field_searchTitle_author (text))
 (def field_searchTitle_publisher (text))
+(def searchTitle_search_table (table))
 
-(def searchTitle_search_panel (grid-panel
-                                :border (label/i18n :text_searchTitle_border)
-                                :columns 1 
-                                :items [(grid-panel
-                                         :columns 2
-                                         :items [(label/i18n :text_searchTitle_name) field_searchTitle_name
-                                                 (label/i18n :text_searchTitle_isbn) field_searchTitle_isbn
-                                                 (label/i18n :text_searchTitle_author) field_searchTitle_author
-                                                 (label/i18n :text_searchTitle_publisher) field_searchTitle_publisher])
-                                       (flow-panel
-                                         :align :right
-                                         :items [(button :action button_searchTitle_clear_action)
-                                                 (button :action button_searchTitle_search_action)])]))
-
-(def searchTitle_search_table (table 
-                                :model [:columns [{:key :id, :text "-"}] 
-                                        :rows [[" " " "]]]))
-
-(def searchTitle_result_panel (grid-panel
-                                :columns 1 
-                                :items [(flow-panel :items [(scrollable searchTitle_search_table)])
-                                        (flow-panel :align :right
-                                                    :items [(button :action button_modifyTitle_action)
-                                                            (button :action button_deleteTitle_action)])]))
-
-(def searchTitle_panel (scrollable (top-bottom-split searchTitle_search_panel searchTitle_result_panel)))
+(def searchTitle_panel (vertical-panel :border (label/i18n :text_searchTitle_border)
+                                       :items [(grid-panel :columns 2
+                                                           :items [(label/i18n :text_searchTitle_name) field_searchTitle_name
+                                                                   (label/i18n :text_searchTitle_isbn) field_searchTitle_isbn
+                                                                   (label/i18n :text_searchTitle_author) field_searchTitle_author
+                                                                   (label/i18n :text_searchTitle_publisher) field_searchTitle_publisher])
+                                               (flow-panel :align :right
+                                                           :items [(button :action button_searchTitle_clear_action)
+                                                                   (button :action button_searchTitle_search_action)])
+                                               (scrollable searchTitle_search_table)
+                                               (flow-panel :align :right  
+                                                           :items [(button :action button_modifyTitle_action)
+                                                                   (button :action button_deleteTitle_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH PUBLISHER PANEL
 
 (def field_searchPublisher_name (text))
+(def searchPublisher_search_table (table))
 
-(def searchPublisher_search_panel (grid-panel
-                                :border (label/i18n :text_searchPublisher_border)
-                                :columns 1 
-                                :items [(grid-panel
-                                         :columns 2
-                                         :items [(label/i18n :text_searchPublisher_name) field_searchPublisher_name])
-                                       (flow-panel
-                                         :align :right
-                                         :items [(button :action button_searchPublisher_clear_action)
-                                                 (button :action button_searchPublisher_search_action)])]))
-
-(def searchPublisher_search_table (table 
-                                    :model [:columns [{:key :id, :text "ID"} {:key :name, :text "Name"}] 
-                                            :rows [["01" "Alexander Nadler"]
-                                                   ["02" "Julian Rossbach"]]]))
-
-(def searchPublisher_result_panel (grid-panel
-                                    :columns 1 
-                                    :items [(flow-panel :items [(scrollable searchPublisher_search_table)])
-                                            (flow-panel :align :right
-                                                        :items [(button :action button_modifyPublisher_action)
-                                                                (button :action button_deletePublisher_action)])]))
-
-(def searchPublisher_panel (top-bottom-split searchPublisher_search_panel searchPublisher_result_panel))
+(def searchPublisher_panel (vertical-panel :border (label/i18n :text_searchPublisher_border)
+                                           :items [(grid-panel :columns 2
+                                                               :items [(label/i18n :text_searchPublisher_name) field_searchPublisher_name])
+                                                   (flow-panel :align :right
+                                                               :items [(button :action button_searchPublisher_clear_action)
+                                                                       (button :action button_searchPublisher_search_action)])
+                                                   (scrollable searchPublisher_search_table)
+                                                   (flow-panel :align :right
+                                                               :items [(button :action button_modifyPublisher_action)
+                                                                       (button :action button_deletePublisher_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; ADD TITLE PANEL
@@ -496,35 +465,27 @@
 (def field_addTitle_author (text))
 (def field_addTitle_publisher (text))
 
-(def addTitle_panel (grid-panel
-                      :border (label/i18n :text_addTitle_border)
-                      :columns 1 
-                      :items [(grid-panel
-                                :columns 2
-                                :items [(label/i18n :text_addTitle_name) field_addTitle_name
-                                        (label/i18n :text_addTitle_isbn) field_addTitle_isbn
-                                        (label/i18n :text_addTitle_author) field_addTitle_author
-                                        (label/i18n :text_addTitle_publisher) field_addTitle_publisher])
-                              (flow-panel
-                                :align :right
-                                :items [(button :action button_addTitle_clear_action)
-                                        (button :action button_addTitle_save_action)])]))
+(def addTitle_panel (vertical-panel :border (label/i18n :text_addTitle_border)
+                                    :items [(grid-panel :columns 2
+                                                        :items [(label/i18n :text_addTitle_name) field_addTitle_name
+                                                                (label/i18n :text_addTitle_isbn) field_addTitle_isbn
+                                                                (label/i18n :text_addTitle_author) field_addTitle_author
+                                                                (label/i18n :text_addTitle_publisher) field_addTitle_publisher])
+                                            (flow-panel :align :right
+                                                        :items [(button :action button_addTitle_clear_action)
+                                                                (button :action button_addTitle_save_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; ADD PUBLISHER PANEL
 
 (def field_addPublisher_name (text))
 
-(def addPublisher_panel (grid-panel
-                          :border (label/i18n :text_addPublisher_border)
-                          :columns 1 
-                          :items [(grid-panel
-                                    :columns 2
-                                    :items [(label/i18n :text_addPublisher_name) field_addPublisher_name])
-                                  (flow-panel
-                                    :align :right
-                                    :items [(button :action button_addPublisher_clear_action)
-                                            (button :action button_addPublisher_save_action)])]))
+(def addPublisher_panel (vertical-panel :border (label/i18n :text_addPublisher_border)
+                                        :items [(grid-panel :columns 2
+                                                            :items [(label/i18n :text_addPublisher_name) field_addPublisher_name])
+                                                (flow-panel :align :right
+                                                            :items [(button :action button_addPublisher_clear_action)
+                                                                    (button :action button_addPublisher_save_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MODIFY TITLE PANEL / FRAME
@@ -535,22 +496,17 @@
 (def field_modifyTitle_author (text))
 (def field_modifyTitle_publisher (text))
 
-(def modifyTitle_panel (grid-panel
-                         :border (label/i18n :text_modifyTitle_border)
-                         :columns 1 
-                         :items [(grid-panel
-                                   :columns 2
-                                   :items [(label/i18n :text_modifyTitle_id) field_modifyTitle_id
-                                           (label/i18n :text_modifyTitle_name) field_modifyTitle_name
-                                           (label/i18n :text_modifyTitle_isbn) field_modifyTitle_isbn
-                                           (label/i18n :text_modifyTitle_author) field_modifyTitle_author
-                                           (label/i18n :text_modifyTitle_publisher) field_modifyTitle_publisher])
-                                 (flow-panel
-                                   :align :right
-                                   :items [(button :action button_modifyTitle_save_action)])]))
+(def modifyTitle_panel (vertical-panel :border (label/i18n :text_modifyTitle_border)
+                                       :items [(grid-panel :columns 2
+                                                           :items [(label/i18n :text_modifyTitle_id) field_modifyTitle_id
+                                                                   (label/i18n :text_modifyTitle_name) field_modifyTitle_name
+                                                                   (label/i18n :text_modifyTitle_isbn) field_modifyTitle_isbn
+                                                                   (label/i18n :text_modifyTitle_author) field_modifyTitle_author
+                                                                   (label/i18n :text_modifyTitle_publisher) field_modifyTitle_publisher])
+                                               (flow-panel :align :right
+                                                           :items [(button :action button_modifyTitle_save_action)])]))
 
 (def frame_modifyTitle (frame :title (label/i18n :text_modifyTitle_frame_title)
-                              :size [640 :by 480]
                               :content modifyTitle_panel))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -559,26 +515,23 @@
 (def field_modifyPublisher_id (text :editable? false))
 (def field_modifyPublisher_name (text))
 
-(def modifyPublisher_panel (grid-panel
-                             :border (label/i18n :text_modifyPublisher_border)
-                             :columns 1 
-                             :items [(grid-panel
-                                       :columns 2
-                                       :items [(label/i18n :text_modifyPublisher_id) field_modifyPublisher_id
-                                               (label/i18n :text_modifyPublisher_name) field_modifyPublisher_name])
-                                     (flow-panel
-                                       :align :right
-                                       :items [(button :action button_modifyPublisher_save_action)])]))
+(def modifyPublisher_panel (vertical-panel :border (label/i18n :text_modifyPublisher_border)
+                                           :items [(grid-panel :columns 2
+                                                               :items [(label/i18n :text_modifyPublisher_id) field_modifyPublisher_id
+                                                                       (label/i18n :text_modifyPublisher_name) field_modifyPublisher_name])
+                                                   (flow-panel :align :right
+                                                               :items [(button :action button_modifyPublisher_save_action)])]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MAIN FRAME
 
 (def frame_main (frame :title (label/i18n :text_frame_main_title)
-                       :size [640 :by 480]
+                       :width 800
+                       :height 600
                        :menubar menu_frame_main
                        :content searchTitle_panel))
                        ;:on-close :exit))
 
 (native!) ; native os ui
-(-> frame_main pack! show!)    
+(-> frame_main show!)
 (log/info "Logging")
