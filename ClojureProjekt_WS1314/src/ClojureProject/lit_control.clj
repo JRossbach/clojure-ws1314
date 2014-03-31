@@ -39,6 +39,12 @@
   [searchPublisherMap] 
   (data/selectPublisher {:name (str "%" (get searchPublisherMap :name) "%")}))
 
+(defn executeSearchPublisherById 
+  ""
+  [publisherId] 
+  (data/selectPublisher {:name (str "%%")
+                         :id publisherId}))
+
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
 

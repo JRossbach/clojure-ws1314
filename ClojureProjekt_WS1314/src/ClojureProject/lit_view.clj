@@ -3,6 +3,8 @@
  (:require [seesaw.core :refer :all]
            [seesaw.table :refer :all]
            [seesaw.dev :refer :all]
+           [seesaw.mig :refer :all]
+           [seesaw.cells :refer :all]
            [clojure.tools.logging :as log]
            [ClojureProject.lit_i18n :as label]
            [ClojureProject.lit_control :as control]))
@@ -53,9 +55,6 @@
 (declare modifyPublisher_panel)
 (declare field_modifyPublisher_id)
 (declare field_modifyPublisher_name)
-
-(declare frame_modifyTitle)
-(declare frame_modifyPublisher)
 
 (declare menu_frame_main)
 (declare frame_main)
@@ -131,6 +130,13 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; HANDLER DATABASE
 
+
+
+
+(declare actualizePublisherComboBoxModel)
+
+
+
 (defn switch 
   "Switches the content of the main windows to the given container"
   [container]
@@ -149,6 +155,7 @@
                                   (config field_database_name :text)
                                   (config field_database_username :text)
                                   (config field_database_password :text))
+    (actualizePublisherComboBoxModel)
     (catch Exception e (writeErrorLog e))))
 
 (defn handleDisconnectDatabase 
@@ -157,44 +164,34 @@
   (control/controlDisconnectDatabase))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
-; HANDLER TITLE
+; SEARCH TITLE
 
 (defn handleClearSearchTitle 
   "Clears the search title text fields"
   []
   (config! field_searchTitle_name :text "")
   (config! field_searchTitle_isbn :text "")
-  (config! field_searchTitle_author :text "")
-  (config! field_searchTitle_publisher :text ""))
-
-(defn handleClearAddTitle 
-  "Clears the add title text fields"
-  []
-  (config! field_addTitle_name :text "")
-  (config! field_addTitle_isbn :text "")
-  (config! field_addTitle_author :text "")
-  (config! field_addTitle_publisher :text ""))
-
-(defn handleModifyTitle 
-  "Opens the modify title panel with the data from the selected title"
-  [] 
-  (let [title (value-at searchTitle_search_table (selection searchTitle_search_table))]
-    (config! field_modifyTitle_id :text (get title :id))
-    (config! field_modifyTitle_name :text (get title :name))
-    (config! field_modifyTitle_isbn :text (get title :isbn))
-    (config! field_modifyTitle_author :text (get title :author))
-    (config! field_modifyTitle_publisher :text (get title :publisher_id))
-    (switch modifyTitle_panel)))
+  (config! field_searchTitle_author :text ""))
 
 (defn handleExecuteSearchTitle 
   "Searches a title in the database for the given conditions"
   []
   (try
     (setTitleResultTableModel (control/executeSearchTitle {:name (config field_searchTitle_name :text)
-                                                         :isbn (config field_searchTitle_isbn :text)
-                                                         :author (config field_searchTitle_author :text)
-                                                         :publisher_id (config field_searchTitle_publisher :text)}))
+                                                           :isbn (config field_searchTitle_isbn :text)
+                                                           :author (config field_searchTitle_author :text)
+                                                           :publisher_id ((selection field_modifyTitle_publisher) :id)}))
     (catch Exception e (writeErrorLog e))))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; ADD TITLE
+
+(defn handleClearAddTitle 
+  "Clears the add title text fields"
+  []
+  (config! field_addTitle_name :text "")
+  (config! field_addTitle_isbn :text "")
+  (config! field_addTitle_author :text ""))  
 
 (defn handleExecuteAddTitle 
   "Adds a new title to the database"
@@ -207,19 +204,35 @@
       (switch searchTitle_panel)
       (handleExecuteSearchTitle))
     (catch Exception e (writeErrorLog e))))
+  
+;-------------------------------------------------------------------------------------------------------------------------------
+; MODIFY TITLE
+
+(defn handleModifyTitle 
+  "Opens the modify title panel with the data from the selected title"
+  [] 
+  (let [title (value-at searchTitle_search_table (selection searchTitle_search_table))]
+    (config! field_modifyTitle_id :text (get title :id))
+    (config! field_modifyTitle_name :text (get title :name))
+    (config! field_modifyTitle_isbn :text (get title :isbn))
+    (config! field_modifyTitle_author :text (get title :author))
+    (selection! field_modifyTitle_publisher (control/executeSearchPublisherById (str (get title :publisher_id))))
+    (switch modifyTitle_panel)))
 
 (defn handleExecuteModifyTitle 
   "Saves the modified title in the database"
   [] 
-  (try
-    ((control/executeModifyTitle {:id (config field_modifyTitle_id :text)
-                                  :name (config field_modifyTitle_name :text)
-                               :isbn (config field_modifyTitle_isbn :text)
-                               :author (config field_modifyTitle_author :text)
-                               :publisher_id (config field_modifyTitle_publisher :text)})
-      (switch searchTitle_panel)
-      (handleExecuteSearchTitle))
+  (try (control/executeModifyTitle {:id (config field_modifyTitle_id :text)
+                                    :name (config field_modifyTitle_name :text)
+                                    :isbn (config field_modifyTitle_isbn :text)
+                                    :author (config field_modifyTitle_author :text)
+                                    :publisher_id ((selection! field_modifyTitle_publisher) :id)})
+    (switch searchTitle_panel)
+    (handleExecuteSearchTitle)
     (catch Exception e (writeErrorLog e))))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; DELETE TITLE
 
 (defn handleExecuteDeleteTitle 
   "Deletes the selected title from the database"
@@ -231,6 +244,23 @@
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; HANDLER PUBLISHER
+
+(defn string-renderer 
+  [f] 
+  (default-list-cell-renderer (fn [this {:keys [value]}] (.setText this (str (f value))))))
+
+(defn actualizePublisherComboBoxModel 
+  ""
+  []
+  (let [comboBoxModel (new javax.swing.DefaultComboBoxModel)
+        publisher (control/executeSearchPublisher {:name ""})]
+    (doseq [p publisher] (.addElement comboBoxModel p))
+    (config! field_searchTitle_publisher :model comboBoxModel)
+    (config! field_searchTitle_publisher :renderer (string-renderer :name))
+    (config! field_addTitle_publisher :model comboBoxModel)
+    (config! field_addTitle_publisher :renderer (string-renderer :name))
+    (config! field_modifyTitle_publisher :model comboBoxModel)
+    (config! field_modifyTitle_publisher :renderer (string-renderer :name))))
 
 (defn handleClearSearchPublisher 
   "Clears the search publisher text fields"
@@ -337,8 +367,6 @@
                                    :handler (fn [e] (handleExecuteModifyPublisher))
                                    :name (label/i18n :text_modifyPublisher_button_save)))
 
-(label/i18n :text_modifyPublisher_button_save)
-
 (def button_deleteTitle_action (action
                                    :handler (fn [e] (handleExecuteDeleteTitle))
                                    :name (label/i18n :text_deleteTitle_button)))
@@ -407,38 +435,39 @@
 (def field_database_username (text"root"))
 (def field_database_password (text ""))
 
-(def database_panel (vertical-panel :border (label/i18n :text_database_border)
-                                    :items [(grid-panel :columns 2
-                                                        :items [(label/i18n :text_database_host) field_database_host
-                                                                (label/i18n :text_database_name) field_database_name
-                                                                (label/i18n :text_database_username) field_database_username
-                                                                (label/i18n :text_database_password) field_database_password])
-                                            (flow-panel :align :right
-                                                        :items [(button :action button_database_save_action)])]))
+(def database_panel (mig-panel :border (label/i18n :text_database_border)
+                               :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                               :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                   :items [[(label/i18n :text_database_host)][field_database_host]
+                                                           [(label/i18n :text_database_name)][field_database_name]
+                                                           [(label/i18n :text_database_username)][field_database_username]
+                                                           [(label/i18n :text_database_password)][field_database_password]])]
+                                       [(flow-panel :align :right
+                                                    :items [(button :action button_database_save_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH TITLE PANEL
 
 (def field_searchTitle_name (text))
-(config! field_searchTitle_name :height 50)
 (def field_searchTitle_isbn (text))
 (def field_searchTitle_author (text))
-(def field_searchTitle_publisher (text))
+(def field_searchTitle_publisher (combobox))
 (def searchTitle_search_table (table))
 
-(def searchTitle_panel (vertical-panel :border (label/i18n :text_searchTitle_border)
-                                       :items [(grid-panel :columns 2
-                                                           :items [(label/i18n :text_searchTitle_name) field_searchTitle_name
-                                                                   (label/i18n :text_searchTitle_isbn) field_searchTitle_isbn
-                                                                   (label/i18n :text_searchTitle_author) field_searchTitle_author
-                                                                   (label/i18n :text_searchTitle_publisher) field_searchTitle_publisher])
-                                               (flow-panel :align :right
-                                                           :items [(button :action button_searchTitle_clear_action)
-                                                                   (button :action button_searchTitle_search_action)])
-                                               (scrollable searchTitle_search_table)
-                                               (flow-panel :align :right  
-                                                           :items [(button :action button_modifyTitle_action)
-                                                                   (button :action button_deleteTitle_action)])]))
+(def searchTitle_panel (mig-panel :border (label/i18n :text_searchTitle_border)
+                                  :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                                  :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                      :items [[(label/i18n :text_searchTitle_name)] [field_searchTitle_name]
+                                                              [(label/i18n :text_searchTitle_isbn)] [field_searchTitle_isbn]
+                                                              [(label/i18n :text_searchTitle_author)] [field_searchTitle_author]
+                                                              [(label/i18n :text_searchTitle_publisher)] [field_searchTitle_publisher]])]
+                                          [(flow-panel :align :right 
+                                                       :items [(button :action button_searchTitle_clear_action)
+                                                               (button :action button_searchTitle_search_action)])]
+                                          [(scrollable searchTitle_search_table)]                                          
+                                          [(flow-panel :align :right 
+                                                       :items [(button :action button_modifyTitle_action)
+                                                               (button :action button_deleteTitle_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH PUBLISHER PANEL
@@ -446,16 +475,17 @@
 (def field_searchPublisher_name (text))
 (def searchPublisher_search_table (table))
 
-(def searchPublisher_panel (vertical-panel :border (label/i18n :text_searchPublisher_border)
-                                           :items [(grid-panel :columns 2
-                                                               :items [(label/i18n :text_searchPublisher_name) field_searchPublisher_name])
-                                                   (flow-panel :align :right
-                                                               :items [(button :action button_searchPublisher_clear_action)
-                                                                       (button :action button_searchPublisher_search_action)])
-                                                   (scrollable searchPublisher_search_table)
-                                                   (flow-panel :align :right
+(def searchPublisher_panel (mig-panel :border (label/i18n :text_searchTitle_border)
+                                      :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                                      :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                          :items [[(label/i18n :text_searchPublisher_name)][field_searchPublisher_name]])]
+                                              [(flow-panel :align :right
+                                                           :items [(button :action button_searchPublisher_clear_action)
+                                                                   (button :action button_searchPublisher_search_action)])]  
+                                              [(scrollable searchPublisher_search_table)]  
+                                              [(flow-panel :align :right
                                                                :items [(button :action button_modifyPublisher_action)
-                                                                       (button :action button_deletePublisher_action)])]))
+                                                                       (button :action button_deletePublisher_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; ADD TITLE PANEL
@@ -463,29 +493,31 @@
 (def field_addTitle_name (text))
 (def field_addTitle_isbn (text))
 (def field_addTitle_author (text))
-(def field_addTitle_publisher (text))
+(def field_addTitle_publisher (combobox))
 
-(def addTitle_panel (vertical-panel :border (label/i18n :text_addTitle_border)
-                                    :items [(grid-panel :columns 2
-                                                        :items [(label/i18n :text_addTitle_name) field_addTitle_name
-                                                                (label/i18n :text_addTitle_isbn) field_addTitle_isbn
-                                                                (label/i18n :text_addTitle_author) field_addTitle_author
-                                                                (label/i18n :text_addTitle_publisher) field_addTitle_publisher])
-                                            (flow-panel :align :right
-                                                        :items [(button :action button_addTitle_clear_action)
-                                                                (button :action button_addTitle_save_action)])]))
+(def addTitle_panel (mig-panel :border (label/i18n :text_addTitle_border)
+                               :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                               :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                   :items [[(label/i18n :text_addTitle_name)][field_addTitle_name]
+                                                           [(label/i18n :text_addTitle_isbn)][field_addTitle_isbn]
+                                                           [(label/i18n :text_addTitle_author)][field_addTitle_author]
+                                                           [(label/i18n :text_addTitle_publisher)][field_addTitle_publisher]])]
+                                       [(flow-panel :align :right
+                                                    :items [(button :action button_addTitle_clear_action)
+                                                            (button :action button_addTitle_save_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; ADD PUBLISHER PANEL
 
 (def field_addPublisher_name (text))
 
-(def addPublisher_panel (vertical-panel :border (label/i18n :text_addPublisher_border)
-                                        :items [(grid-panel :columns 2
-                                                            :items [(label/i18n :text_addPublisher_name) field_addPublisher_name])
-                                                (flow-panel :align :right
-                                                            :items [(button :action button_addPublisher_clear_action)
-                                                                    (button :action button_addPublisher_save_action)])]))
+(def addPublisher_panel (mig-panel :border (label/i18n :text_addPublisher_border)
+                                   :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                                   :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                       :items [[(label/i18n :text_addPublisher_name)][field_addPublisher_name]])]
+                                           [(flow-panel :align :right
+                                                        :items [(button :action button_addPublisher_clear_action)
+                                                                (button :action button_addPublisher_save_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MODIFY TITLE PANEL / FRAME
@@ -494,20 +526,18 @@
 (def field_modifyTitle_name (text))
 (def field_modifyTitle_isbn (text))
 (def field_modifyTitle_author (text))
-(def field_modifyTitle_publisher (text))
+(def field_modifyTitle_publisher (combobox))
 
-(def modifyTitle_panel (vertical-panel :border (label/i18n :text_modifyTitle_border)
-                                       :items [(grid-panel :columns 2
-                                                           :items [(label/i18n :text_modifyTitle_id) field_modifyTitle_id
-                                                                   (label/i18n :text_modifyTitle_name) field_modifyTitle_name
-                                                                   (label/i18n :text_modifyTitle_isbn) field_modifyTitle_isbn
-                                                                   (label/i18n :text_modifyTitle_author) field_modifyTitle_author
-                                                                   (label/i18n :text_modifyTitle_publisher) field_modifyTitle_publisher])
-                                               (flow-panel :align :right
-                                                           :items [(button :action button_modifyTitle_save_action)])]))
-
-(def frame_modifyTitle (frame :title (label/i18n :text_modifyTitle_frame_title)
-                              :content modifyTitle_panel))
+(def modifyTitle_panel (mig-panel :border (label/i18n :text_modifyTitle_border)
+                                  :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                                  :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                      :items [[(label/i18n :text_modifyTitle_id)][field_modifyTitle_id]
+                                                              [(label/i18n :text_modifyTitle_name)][field_modifyTitle_name]
+                                                              [(label/i18n :text_modifyTitle_isbn)][field_modifyTitle_isbn]
+                                                              [(label/i18n :text_modifyTitle_author)][field_modifyTitle_author]
+                                                              [(label/i18n :text_modifyTitle_publisher)][field_modifyTitle_publisher]])]
+                                          [(flow-panel :align :right
+                                                       :items [(button :action button_modifyTitle_save_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MODIFY PUBLISHER PANEL / FRAME
@@ -515,12 +545,13 @@
 (def field_modifyPublisher_id (text :editable? false))
 (def field_modifyPublisher_name (text))
 
-(def modifyPublisher_panel (vertical-panel :border (label/i18n :text_modifyPublisher_border)
-                                           :items [(grid-panel :columns 2
-                                                               :items [(label/i18n :text_modifyPublisher_id) field_modifyPublisher_id
-                                                                       (label/i18n :text_modifyPublisher_name) field_modifyPublisher_name])
-                                                   (flow-panel :align :right
-                                                               :items [(button :action button_modifyPublisher_save_action)])]))
+(def modifyPublisher_panel (mig-panel :border (label/i18n :text_modifyPublisher_border)
+                                      :constraints ["wrap 1" "[grow, fill]" "[fill]"]
+                                      :items [[(mig-panel :constraints ["wrap 2" "[shrink 0]100px[200, grow, fill]" "[shrink 0]5px[]"]
+                                                          :items [[(label/i18n :text_modifyPublisher_id)][field_modifyPublisher_id]
+                                                                  [(label/i18n :text_modifyPublisher_name)][field_modifyPublisher_name]])]
+                                              [(flow-panel :align :right
+                                                           :items [(button :action button_modifyPublisher_save_action)])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MAIN FRAME
@@ -534,4 +565,4 @@
 
 (native!) ; native os ui
 (-> frame_main show!)
-(log/info "Logging")
+(log/info "start programm")

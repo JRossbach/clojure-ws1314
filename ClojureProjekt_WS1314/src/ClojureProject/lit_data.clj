@@ -93,14 +93,14 @@
         (log/debug "select all publisher result [" result "]")
         result))    
   ([conditions]     
-    (if (str/blank? (get conditions :id)) 
-      (let [result (select publisher 
-                         (where  (and {:name [like (get conditions :name)]})) 
-                         (order :name :ASC))]
-                  (log/debug "select publisher conditions [" conditions "]")
-                  (log/debug "select publisher result [" result "]")
-      result)
-      (let [result (select publisher 
+    (if (nil? (get conditions :id)) 
+     (let [result (select publisher 
+                       (where  (and {:name [like (get conditions :name)]})) 
+                       (order :name :ASC))]
+                (log/debug "select publisher conditions [" conditions "]")
+                (log/debug "select publisher result [" result "]")
+     result)
+     (let [result (select publisher 
                          (where  (and {:id [= (get conditions :id)]}
                                       {:name [like (get conditions :name)]})) 
                          (order :name :ASC))]
