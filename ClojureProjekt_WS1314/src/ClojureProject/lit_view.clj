@@ -12,7 +12,7 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DECLARETION
 
-(declare setTitleResultTableModel)
+(declare setTitleResult)
 (declare setPublisherResultTableModel)
 
 (declare setResultTableModel)
@@ -71,13 +71,39 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SET ITEM CONTENTS
 
-(declare setTitResultTableModel)
+(declare setTitleResultTableModel)
 (declare setPubResultTableModel)
-(defn setTitleResultTableModel 
+(declare getResultTableBody)
+(declare getTitleResultTableHead)
+
+(defn setTitleResult
   "Fills the search title result table with the given result map"
   [result]
-  (cond (empty? result) (setTitResultTableModel searchTitle_search_table)
-        :else (setTitResultTableModel searchTitle_search_table result)))
+  (if (empty? result) 
+      (setTitleResultTableModel)
+      (setTitleResultTableModel result)))
+
+(defn setTitleResultTableModel 
+  ([] (clear! searchTitle_search_table))
+  ([result] 
+    (log/info "VERSUCH1: "(getTitleResultTableHead22 result))
+    (log/info "VERSUCH2: "(getTitleResultTableHead23 result))
+    (config! searchTitle_search_table :model [:columns (getTitleResultTableHead result) 
+                                                      :rows (getResultTableBody result)])))
+
+(defn getTitleResultTableHead 
+  [result] [{:key :publisher_id, :text "PublisherID"}
+            {:key :author, :text "Author"}
+            {:key :isbn, :text "ISBN"}
+            {:key :name, :text "Name"}
+            {:key :id, :text "ID"}])
+
+(defn getResultTableBody 
+  [result] (vec (for [record result] 
+                  (vec (vals record)))))
+
+
+
 
 (defn setPublisherResultTableModel 
   "Fills the search publisher result table with the given result map"
@@ -85,13 +111,6 @@
   (cond (empty? result) (setPubResultTableModel searchPublisher_search_table)
         :else (setPubResultTableModel searchPublisher_search_table result)))
 
-(defn setTitResultTableModel 
-  ([table] (config! table 
-                    :model [:columns [{:key :text, :text ""}] 
-                            :rows [[(label/i18n :text_table_noResult)]]]))
-  ([table result] (config! table 
-                           :model [:columns (getTitleResultTableHead result) 
-                                   :rows (getResultTableBody result)])))
 
 (declare getPublisherResultTableHead)
 (defn setPubResultTableModel 
@@ -116,52 +135,56 @@
   [result] [{:key :name, :text "Name"}
             {:key :id, :text "ID"}])
 
-(defn getTitleResultTableHead 
-  [result] [{:key :publisher_id, :text "PublisherID"}
-            {:key :author, :text "Author"}
-            {:key :isbn, :text "ISBN"}
-            {:key :name, :text "Name"}
-            {:key :id, :text "ID"}])
-
-(defn getResultTableBody 
-  [result] (vec (for [record result] 
-                  (vec (vals record)))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
-; HANDLER DATABASE
+; UTIL
 
+(def defaultDatabaseHost "localhost")
+(def defaultDatabaseName "clojureprojekt")
+(def defaultDatabaseUsername "root")
+(def defaultDatabasePassword "")
 
-
-
-(declare actualizePublisherComboBoxModel)
-
-
+(def defaultComboBoxEntry {:name "-" :id -1})
 
 (defn switch 
   "Switches the content of the main windows to the given container"
   [container]
   (config! frame_main :content container))
 
-(defn handleSaveConfiguration 
-  "Saves the database connection data"
+(defn string-renderer 
+  "Renderer for combobox display string"
+  [f] 
+  (default-list-cell-renderer (fn [this {:keys [value]}] (.setText this (str (f value))))))
+
+(defn actualizePublisherComboBoxModel 
+  "Actualizes the combobox entries with the existing publishers"
   []
-  (control/saveConfiguration))
+  (let [comboBoxModel (new javax.swing.DefaultComboBoxModel)
+        publisher (control/executeSearchPublisher {:name ""})]
+    (.addElement comboBoxModel defaultComboBoxEntry)
+    (doseq [p publisher] (.addElement comboBoxModel p))
+    (config! field_searchTitle_publisher :model comboBoxModel)
+    (config! field_addTitle_publisher :model comboBoxModel)
+    (config! field_modifyTitle_publisher :model comboBoxModel)))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; DATABASE
 
 (defn handleConnectDatabase 
   "Opens a database connection with the connection data from the database fields"
   []
-  (try
-    (control/controlConnectDatabase (config field_database_host :text)
-                                  (config field_database_name :text)
-                                  (config field_database_username :text)
-                                  (config field_database_password :text))
+  (try (control/controlConnectDatabase {:host (config field_database_host :text)
+                                        :db (config field_database_name :text)
+                                        :user (config field_database_username :text)
+                                        :password (config field_database_password :text)})
     (actualizePublisherComboBoxModel)
     (catch Exception e (writeErrorLog e))))
 
 (defn handleDisconnectDatabase 
   "Closes the actual active database connection"
   []
-  (control/controlDisconnectDatabase))
+  (try (control/controlDisconnectDatabase)
+    (catch Exception e (writeErrorLog e))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH TITLE
@@ -171,16 +194,16 @@
   []
   (config! field_searchTitle_name :text "")
   (config! field_searchTitle_isbn :text "")
-  (config! field_searchTitle_author :text ""))
+  (config! field_searchTitle_author :text "")
+  (selection! field_searchTitle_publisher defaultComboBoxEntry))
 
 (defn handleExecuteSearchTitle 
   "Searches a title in the database for the given conditions"
   []
-  (try
-    (setTitleResultTableModel (control/executeSearchTitle {:name (config field_searchTitle_name :text)
-                                                           :isbn (config field_searchTitle_isbn :text)
-                                                           :author (config field_searchTitle_author :text)
-                                                           :publisher_id ((selection field_modifyTitle_publisher) :id)}))
+  (try (setTitleResult (control/executeSearchTitle {:name (config field_searchTitle_name :text)
+                                                    :isbn (config field_searchTitle_isbn :text)
+                                                    :author (config field_searchTitle_author :text)
+                                                    :publisher_id ((selection field_modifyTitle_publisher) :id)}))
     (catch Exception e (writeErrorLog e))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -191,18 +214,18 @@
   []
   (config! field_addTitle_name :text "")
   (config! field_addTitle_isbn :text "")
-  (config! field_addTitle_author :text ""))  
+  (config! field_addTitle_author :text "")
+  (selection! field_searchTitle_publisher defaultComboBoxEntry))  
 
 (defn handleExecuteAddTitle 
   "Adds a new title to the database"
   []
-  (try
-    ((control/executeAddTitle {:name (config field_addTitle_name :text)
-                            :isbn (config field_addTitle_isbn :text)
-                            :author (config field_addTitle_author :text)
-                            :publisher_id (config field_addTitle_publisher :text)})
-      (switch searchTitle_panel)
-      (handleExecuteSearchTitle))
+  (try (control/executeAddTitle {:name (config field_addTitle_name :text)
+                                 :isbn (config field_addTitle_isbn :text)
+                                 :author (config field_addTitle_author :text)
+                                 :publisher_id ((selection field_modifyTitle_publisher) :id)})
+    (switch searchTitle_panel)
+    (handleExecuteSearchTitle)
     (catch Exception e (writeErrorLog e))))
   
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -216,7 +239,7 @@
     (config! field_modifyTitle_name :text (get title :name))
     (config! field_modifyTitle_isbn :text (get title :isbn))
     (config! field_modifyTitle_author :text (get title :author))
-    (selection! field_modifyTitle_publisher (control/executeSearchPublisherById (str (get title :publisher_id))))
+    (selection! field_modifyTitle_publisher (get (control/executeSearchPublisherById (get title :publisher_id)) 0))
     (switch modifyTitle_panel)))
 
 (defn handleExecuteModifyTitle 
@@ -226,10 +249,10 @@
                                     :name (config field_modifyTitle_name :text)
                                     :isbn (config field_modifyTitle_isbn :text)
                                     :author (config field_modifyTitle_author :text)
-                                    :publisher_id ((selection! field_modifyTitle_publisher) :id)})
+                                    :publisher_id ((selection field_modifyTitle_publisher) :id)})
     (switch searchTitle_panel)
     (handleExecuteSearchTitle)
-    (catch Exception e (writeErrorLog e))))
+    (catch Exception e (str "caught exception: " (.getMessage e)))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; DELETE TITLE
@@ -237,40 +260,44 @@
 (defn handleExecuteDeleteTitle 
   "Deletes the selected title from the database"
   [] 
-  (try
-    ((control/executeDeleteTitle (get (value-at searchTitle_search_table (selection searchTitle_search_table)) :id))
-      (handleExecuteSearchTitle))
+  (try (control/executeDeleteTitle (get (value-at searchTitle_search_table (selection searchTitle_search_table)) :id))
+    (switch searchTitle_panel)
+    (handleExecuteSearchTitle)
     (catch Exception e (writeErrorLog e))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
-; HANDLER PUBLISHER
-
-(defn string-renderer 
-  [f] 
-  (default-list-cell-renderer (fn [this {:keys [value]}] (.setText this (str (f value))))))
-
-(defn actualizePublisherComboBoxModel 
-  ""
-  []
-  (let [comboBoxModel (new javax.swing.DefaultComboBoxModel)
-        publisher (control/executeSearchPublisher {:name ""})]
-    (doseq [p publisher] (.addElement comboBoxModel p))
-    (config! field_searchTitle_publisher :model comboBoxModel)
-    (config! field_searchTitle_publisher :renderer (string-renderer :name))
-    (config! field_addTitle_publisher :model comboBoxModel)
-    (config! field_addTitle_publisher :renderer (string-renderer :name))
-    (config! field_modifyTitle_publisher :model comboBoxModel)
-    (config! field_modifyTitle_publisher :renderer (string-renderer :name))))
+; SEARCH PUBLISHER
 
 (defn handleClearSearchPublisher 
   "Clears the search publisher text fields"
   []
   (config! field_searchPublisher_name :text ""))
 
+(defn handleExecuteSearchPublisher 
+  "Searches a publisher in the database for the given conditions"
+  []
+  (try (setPublisherResultTableModel (control/executeSearchPublisher {:name (config field_searchPublisher_name :text)}))
+    (catch Exception e (writeErrorLog e))))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; ADD PUBLISHER
+
 (defn handleClearAddPublisher 
   "Clears the add publisher text fields"
   []
   (config! field_addPublisher_name :text ""))
+
+(defn handleExecuteAddPublisher 
+  "Adds a new publisher to the database"
+  []
+  (try (control/executeAddPublisher {:name (config field_addPublisher_name :text)})
+    (actualizePublisherComboBoxModel)
+    (switch searchPublisher_panel)
+    (handleExecuteSearchPublisher)
+    (catch Exception e (writeErrorLog e))))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; MODIFY PUBLISHER
 
 (defn handleModifyPublisher 
   "Opens the modify publisher window with the data from the selected publisher"
@@ -280,44 +307,30 @@
     (config! field_modifyPublisher_name :text (get publisher :name))
     (switch modifyPublisher_panel)))
 
-(defn handleExecuteSearchPublisher 
-  "Searches a publisher in the database for the given conditions"
-  []
-  (try
-    (setPublisherResultTableModel (control/executeSearchPublisher {:name (config field_searchPublisher_name :text)}))
-    (catch Exception e (writeErrorLog e))))
-
-(defn handleExecuteAddPublisher 
-  "Adds a new publisher to the database"
-  []
-  (try
-    (control/executeAddPublisher {:name (config field_addPublisher_name :text)})
-    (catch Exception e (writeErrorLog e))))
-
 (defn handleExecuteModifyPublisher 
   "Saves the modified publisher in the database"
   []
-  (try
-    ((control/executeModifyPublisher {:id (config field_modifyPublisher_id :text)
-                                      :name (config field_modifyPublisher_name :text)})
-      (switch searchPublisher_panel)
-      (handleExecuteSearchPublisher))
+  (try (control/executeModifyPublisher {:id (config field_modifyPublisher_id :text)
+                                        :name (config field_modifyPublisher_name :text)})
+    (actualizePublisherComboBoxModel)
+    (switch searchPublisher_panel)
+    (handleExecuteSearchPublisher)
     (catch Exception e (writeErrorLog e))))
+
+;-------------------------------------------------------------------------------------------------------------------------------
+; DELETE PUBLISHER
 
 (defn handleExecuteDeletePublisher 
   "Deletes the selected publisher from the database"
   [] 
-  (try
-    ((control/executeDeletePublisher (get (value-at searchPublisher_search_table (selection searchPublisher_search_table)) :id))
-      (handleExecuteSearchPublisher))
+  (try (control/executeDeletePublisher (get (value-at searchPublisher_search_table (selection searchPublisher_search_table)) :id))
+    (actualizePublisherComboBoxModel)
+    (switch searchPublisher_panel)
+    (handleExecuteSearchPublisher)
     (catch Exception e (writeErrorLog e))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; BUTTON ACTIONS
-
-(def button_database_save_action (action
-                                   :handler (fn [e] (handleSaveConfiguration))
-                                   :name (label/i18n :text_database_button_save)))
 
 (def button_searchTitle_clear_action (action
                                    :handler (fn [e] (handleClearSearchTitle))
@@ -388,11 +401,6 @@
                     :name (label/i18n :text_menubar_database_item_connect)
                     :tip  (label/i18n :text_menubar_database_item_connect_tooltip)))
 
-(def menubar_database_item_disconnect_action (action
-                    :handler (fn [e] (handleDisconnectDatabase))
-                    :name (label/i18n :text_menubar_database_item_disconnect)
-                    :tip  (label/i18n :text_menubar_database_item_disconnect_tooltip)))
-
 (def menubar_operations_item_searchTitle_action (action
                     :handler (fn [e] (switch searchTitle_panel))
                     :name (label/i18n :text_menubar_operations_item_searchTitle)
@@ -419,8 +427,7 @@
 (def menu_frame_main (menubar :items 
                          [(menu :text (label/i18n :text_menubar_database_main_title) 
                                 :items [menubar_database_item_config_action
-                                        menubar_database_item_connect_action
-                                        menubar_database_item_disconnect_action])
+                                        menubar_database_item_connect_action])
                           (menu :text (label/i18n :text_menubar_operations_main_title)
                                 :items [menubar_operations_item_searchTitle_action
                                         menubar_operations_item_addTitle_action
@@ -441,9 +448,7 @@
                                                    :items [[(label/i18n :text_database_host)][field_database_host]
                                                            [(label/i18n :text_database_name)][field_database_name]
                                                            [(label/i18n :text_database_username)][field_database_username]
-                                                           [(label/i18n :text_database_password)][field_database_password]])]
-                                       [(flow-panel :align :right
-                                                    :items [(button :action button_database_save_action)])]]))
+                                                           [(label/i18n :text_database_password)][field_database_password]])]]))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH TITLE PANEL
@@ -451,7 +456,7 @@
 (def field_searchTitle_name (text))
 (def field_searchTitle_isbn (text))
 (def field_searchTitle_author (text))
-(def field_searchTitle_publisher (combobox))
+(def field_searchTitle_publisher (combobox :renderer (string-renderer :name)))
 (def searchTitle_search_table (table))
 
 (def searchTitle_panel (mig-panel :border (label/i18n :text_searchTitle_border)
@@ -493,7 +498,7 @@
 (def field_addTitle_name (text))
 (def field_addTitle_isbn (text))
 (def field_addTitle_author (text))
-(def field_addTitle_publisher (combobox))
+(def field_addTitle_publisher (combobox :renderer (string-renderer :name)))
 
 (def addTitle_panel (mig-panel :border (label/i18n :text_addTitle_border)
                                :constraints ["wrap 1" "[grow, fill]" "[fill]"]
@@ -526,7 +531,7 @@
 (def field_modifyTitle_name (text))
 (def field_modifyTitle_isbn (text))
 (def field_modifyTitle_author (text))
-(def field_modifyTitle_publisher (combobox))
+(def field_modifyTitle_publisher (combobox :renderer (string-renderer :name)))
 
 (def modifyTitle_panel (mig-panel :border (label/i18n :text_modifyTitle_border)
                                   :constraints ["wrap 1" "[grow, fill]" "[fill]"]
@@ -556,6 +561,8 @@
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; MAIN FRAME
 
+(native!) ; native os ui
+
 (def frame_main (frame :title (label/i18n :text_frame_main_title)
                        :width 800
                        :height 600
@@ -563,6 +570,5 @@
                        :content searchTitle_panel))
                        ;:on-close :exit))
 
-(native!) ; native os ui
-(-> frame_main show!)
 (log/info "start programm")
+(-> frame_main show!)

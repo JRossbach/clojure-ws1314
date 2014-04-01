@@ -8,9 +8,9 @@
 ; -------------------------------------------------------------------------------------
 ; DECLARETIONS
 
+(declare mySQLDatabase)
 (declare title)
 (declare publisher)
-(declare mySQLDatabase)
 
 (declare connectDatabase)
 (declare disconnectDatabase)
@@ -35,29 +35,34 @@
 
 (defn connectDatabase 
   "Opens the connection to a database with the given connection data."
-  [connectionData] (defdb mySQLDatabase (mysql connectionData)) 
-                    (log/info "connection opened to database [" mySQLDatabase "]")
-                    
-                    (defentity title
-                      (database mySQLDatabase) 
-                      (pk :id) 
-                      (table :tbl_title)
-                      (entity-fields :isbn :name :author :publisher_id)
-                      (belongs-to publisher {:fk :publisher_id}))
-                    (log/info "defined entity title [" title "]")
+  [connectionData] 
+  
+  ; database
+  (defdb mySQLDatabase (mysql connectionData)) 
+  (log/info "connection opened to database [" mySQLDatabase "]")
+                  
+  ; entity title  
+  (defentity title
+    (database mySQLDatabase) 
+    (pk :id) 
+    (table :tbl_title)
+    (entity-fields :isbn :name :author :publisher_id)
+    (belongs-to publisher {:fk :publisher_id}))
+  (log/info "defined entity title [" title "]")
 
-                    (defentity publisher
-                      (database mySQLDatabase) 
-                      (pk :id) 
-                      (table :tbl_publisher)
-                      (entity-fields :name))
-                    (log/info "defined entity publisher [" publisher "]"))     
+  ; entity publisher
+  (defentity publisher
+    (database mySQLDatabase) 
+    (pk :id) 
+    (table :tbl_publisher)
+    (entity-fields :name))
+  (log/info "defined entity publisher [" publisher "]"))     
 
 (defn disconnectDatabase
   "Closes the connection to the actual defined database."
   [] 
   (log/debug "close database connection")
-  (-> (connection-pool (get-connection mySQLDatabase)):datasource .close))
+  (.close ((get-connection mySQLDatabase) :datasource) true))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE SELECT
@@ -68,19 +73,19 @@
         (log/debug "select all title result [" result "]") 
         result))     
   ([conditions] 
-    (if (str/blank? (get conditions :publisher_id)) 
+    (if (identical? -1 (get conditions :publisher_id)) 
       (let [result (select title 
-                           (where (and {:isbn [like (get conditions :isbn)]}
-                                       {:name [like (get conditions :name)]}
-                                       {:author [like (get conditions :author)]}))
+                           (where (and {:isbn [like (str "%" (get conditions :isbn) "%")]}
+                                       {:name [like (str "%" (get conditions :name) "%")]}
+                                       {:author [like (str "%" (get conditions :author) "%")]}))
                            (order :name :ASC))]
         (log/debug "select title conditions [" conditions "]")
         (log/debug "select title result [" result "]") 
         result)
       (let [result (select title 
-                           (where (and {:isbn [like (get conditions :isbn)]}
-                                       {:name [like (get conditions :name)]}
-                                       {:author [like (get conditions :author)]}
+                           (where (and {:isbn [like (str "%" (get conditions :isbn) "%")]}
+                                       {:name [like (str "%" (get conditions :name) "%")]}
+                                       {:author [like (str "%" (get conditions :author) "%")]}
                                        {:publisher_id [= (get conditions :publisher_id)]}))
                            (order :name :ASC))]
         (log/debug "select title conditions [" conditions "]")
@@ -95,14 +100,14 @@
   ([conditions]     
     (if (nil? (get conditions :id)) 
      (let [result (select publisher 
-                       (where  (and {:name [like (get conditions :name)]})) 
+                       (where  (and {:name [like (str "%" (get conditions :name) "%")]})) 
                        (order :name :ASC))]
                 (log/debug "select publisher conditions [" conditions "]")
                 (log/debug "select publisher result [" result "]")
      result)
      (let [result (select publisher 
                          (where  (and {:id [= (get conditions :id)]}
-                                      {:name [like (get conditions :name)]})) 
+                                      {:name [like (str "%" (get conditions :name) "%")]})) 
                          (order :name :ASC))]
                   (log/debug "select publisher conditions [" conditions "]")
                   (log/debug "select publisher result [" result "]")
@@ -114,13 +119,13 @@
 (defn insertTitle
   "Inserts a title in the database"
   [newtitle] 
-    (log/debug "insert title [" newtitle "] into database")
+    (log/debug "insert title [" newtitle "]")
     (insert title (values newtitle)))
 
 (defn insertPublisher
   "Inserts a publisher in the database"
   [newPublisher] 
-    (log/debug "insert publisher [" newPublisher "] into database")
+    (log/debug "insert publisher [" newPublisher "]")
     (insert publisher (values newPublisher)))
 
 ; -------------------------------------------------------------------------------------
