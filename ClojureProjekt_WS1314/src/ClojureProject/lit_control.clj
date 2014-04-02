@@ -1,37 +1,35 @@
 ; -------------------------------------------------------------------------------------
 (ns ClojureProject.lit_control
-  (:require [ClojureProject.lit_data :as data]
-            [clojure.tools.logging :as log]))
-
-; -------------------------------------------------------------------------------------
-; DATABASE OPERATIONS
-
-(defn controlConnectDatabase 
-  "Opens a connection to a database with the given connection data"
-  [connectionData]
-  (data/connectDatabase connectionData))
-
-(defn controlDisconnectDatabase 
-  "closes the open database connection"
-  [] 
-  (data/disconnectDatabase))
+  (:require [clojure.tools.logging :as log]
+            [ClojureProject.lit_data :as data]
+            [ClojureProject.lit_types :as types]))
 
 ; -------------------------------------------------------------------------------------
 ; SEARCH ITEMS
 
-; werte einzeln übergeben und map hier zusammenbauen und dann übergeben...
-; defprotocoll defrecord
-; table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  
+(defmulti search type)
 
-(defn executeSearchTitle 
-  "Calls the model method to find a title with the given search conditions in the database"
-  [searchTitleMap] 
-  (data/selectTitle searchTitleMap))
+(defmethod search ::types/title [t] 
+  (log/debug "Search title with conditions[" + t + "]")
+  (let [result (data/selectTitle t)]
+    (with-local-vars [acc, result]
+      (var-set acc [])
+      (doseq [value result]
+        (var-set acc (conj @acc (types/title (value :id)
+                                             (value :name)
+                                             (value :author)
+                                             (value :isbn)
+                                             (types/publisher (value :id_2)
+                                                              (value :name_2))))))@acc)))
 
-(defn executeSearchPublisher 
-  "Calls the model method to find a publisher with the given search conditions in the database"
-  [searchPublisherMap] 
-  (data/selectPublisher searchPublisherMap))
+(defmethod search ::types/publisher [p] 
+  (log/debug "Search publisher with conditions[" + p + "]")
+  (let [result (data/selectPublisher p)]
+    (with-local-vars [acc, result]
+      (var-set acc [])
+      (doseq [value result]
+        (var-set acc (conj @acc (types/publisher (value :id)
+                                                 (value :name)))))@acc)))
 
 (defn executeSearchPublisherById 
   "Calls the model method to find a publisher with the given id in the database"
@@ -41,38 +39,40 @@
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
 
-(defn executeAddTitle 
-  "Calls the model method to add a new title to the database"
-  [titleMap] 
-  (data/insertTitle titleMap))
+(defmulti add type)
 
-(defn executeAddPublisher 
-  "Calls the model method to add a new publisher to the database"
-  [publisherMap] 
-  (data/insertPublisher publisherMap))
+(defmethod add ::types/title [t] 
+  (log/debug "try to add title [" t "]")
+  (data/insertTitle t))
+
+(defmethod add ::types/publisher [p]  
+  (log/debug "try to add publisher [" p "]")
+  (data/insertPublisher p))
 
 ; -------------------------------------------------------------------------------------
-; MODIFY ITEMS
+; UPDATE ITEMS
 
-(defn executeModifyTitle 
-  "Calls the model method to modify a title in the database"
-  [titleMap] 
-  (data/updateTitle titleMap))
+(defmulti update type)
 
-(defn executeModifyPublisher 
-  "Calls the model method to modify a publisher in the database"
-  [publisherMap] 
-  (data/updatePublisher publisherMap))
+(defmethod update ::types/title [t] 
+  (log/debug "try to update title [" t "]")
+  (data/updateTitle t))
+
+(defmethod update ::types/publisher [p] 
+  (log/debug "try to update publisher [" p "]")
+  (data/updatePublisher p))
 
 ; -------------------------------------------------------------------------------------
 ; DELETE ITEMS
 
-(defn executeDeleteTitle 
-  "Calls the model method to delete a title from the database"
-  [titleId] 
-  (data/deleteTitle titleId))
+(defmulti delete type)
 
-(defn executeDeletePublisher 
-  "Calls the model method to delete a publisher from the database"
-  [publisherId] 
-  (data/deletePublisher publisherId))
+(defmethod delete ::types/title [t]
+  (log/debug "try to delete title [" t "]")
+  (data/deleteTitle (:id t)))
+
+(defmethod delete ::types/publisher [p]
+  (log/debug "try to delete publisher [" p "]")
+  (data/deletePublisher (:id p)))
+
+
