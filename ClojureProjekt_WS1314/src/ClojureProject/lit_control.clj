@@ -4,15 +4,6 @@
             [clojure.tools.logging :as log]))
 
 ; -------------------------------------------------------------------------------------
-; RECORDS
-
-(defn title [id, name, isbn, author, publisher_id]
-  ^{:type ::title} {:id id, :name name, :isbn isbn, :author author, :publisher_id publisher_id})
-
-(defn publisher [id, name]
-  ^{:type ::publisher} {:id id, :name name})
-
-; -------------------------------------------------------------------------------------
 ; DATABASE OPERATIONS
 
 (defn controlConnectDatabase 
@@ -27,6 +18,10 @@
 
 ; -------------------------------------------------------------------------------------
 ; SEARCH ITEMS
+
+; werte einzeln übergeben und map hier zusammenbauen und dann übergeben...
+; defprotocoll defrecord
+; table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);  
 
 (defn executeSearchTitle 
   "Calls the model method to find a title with the given search conditions in the database"

@@ -36,28 +36,27 @@
 (defn connectDatabase 
   "Opens the connection to a database with the given connection data."
   [connectionData] 
-  
-  ; database
+
   (defdb mySQLDatabase (mysql connectionData)) 
-  (log/info "connection opened to database [" mySQLDatabase "]")
-                  
-  ; entity title  
+
   (defentity title
     (database mySQLDatabase) 
     (pk :id) 
     (table :tbl_title)
-    (entity-fields :isbn :name :author :publisher_id)
-    (belongs-to publisher {:fk :publisher_id}))
-  (log/info "defined entity title [" title "]")
+    (entity-fields :isbn :name :author :id_publisher)
+    (belongs-to ClojureProject.lit_data/publisher {:fk :id_publisher}))
 
-  ; entity publisher
   (defentity publisher
     (database mySQLDatabase) 
     (pk :id) 
     (table :tbl_publisher)
-    (entity-fields :name))
+    (entity-fields :name)
+    (has-many ClojureProject.lit_data/title))
+  
+  (log/info "connection opened to database [" mySQLDatabase "]")
+  (log/info "defined entity title [" title "]")
   (log/info "defined entity publisher [" publisher "]"))     
-
+  
 (defn disconnectDatabase
   "Closes the connection to the actual defined database."
   [] 
@@ -73,7 +72,7 @@
         (log/debug "select all title result [" result "]") 
         result))     
   ([conditions] 
-    (if (identical? -1 (get conditions :publisher_id)) 
+      (if (identical? -1 (get conditions :id_publisher)) 
       (let [result (select title 
                            (where (and {:isbn [like (str "%" (get conditions :isbn) "%")]}
                                        {:name [like (str "%" (get conditions :name) "%")]}
@@ -86,11 +85,12 @@
                            (where (and {:isbn [like (str "%" (get conditions :isbn) "%")]}
                                        {:name [like (str "%" (get conditions :name) "%")]}
                                        {:author [like (str "%" (get conditions :author) "%")]}
-                                       {:publisher_id [= (get conditions :publisher_id)]}))
+                                       {:id_publisher [= (get conditions :id_publisher)]}))
                            (order :name :ASC))]
         (log/debug "select title conditions [" conditions "]")
         (log/debug "select title result [" result "]") 
-        result))))
+        result)
+     )))
 
 (defn selectPublisher
   "Selects a number of publishers from the database"  
@@ -131,6 +131,8 @@
 ; -------------------------------------------------------------------------------------
 ; DATABASE UPDATE
 
+; DOCH TRANSACTION
+
 (defn updateTitle
   "Updates a title in the database"
   [titleMap] 
@@ -139,7 +141,7 @@
           (set-fields {:isbn (get titleMap :isbn) 
                        :name (get titleMap :name)
                        :author (get titleMap :author)
-                       :publisher_id (get titleMap :publisher_id)})
+                       :id_publisher (get titleMap :id_publisher)})
           (where {:id [= (get titleMap :id)]})))
 
 (defn updatePublisher

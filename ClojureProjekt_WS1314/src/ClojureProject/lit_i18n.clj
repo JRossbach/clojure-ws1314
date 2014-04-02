@@ -5,7 +5,10 @@
 ; NATIONALIZATION
 
 (def ^:private default
-  {:text_frame_main_title "Literaturverzeichnis"   
+  {:text_frame_messagebox_title "Fehler!"
+   :text_frame_messagebox_button "Ok"
+   
+   :text_frame_main_title "Literaturverzeichnis"   
    :text_menubar_database_main_title "Datenbank"
    :text_menubar_database_item_config "Datenbank konfigurieren"
    :text_menubar_database_item_config_tooltip "Zeigt die aktuelle Konfigurieren der Datenbank-Verbindung an"
