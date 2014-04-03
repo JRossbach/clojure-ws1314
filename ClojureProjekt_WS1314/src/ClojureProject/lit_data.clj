@@ -24,11 +24,15 @@
 (declare deleteTitle)
 (declare deletePublisher)
 
-(declare checkTitle)
 (declare checkPublisher)
 
 ; -------------------------------------------------------------------------------------
 ; UTIL
+
+(def databaseConfiguration {:host "localhost"
+                             :db "clojureprojekt"
+                             :user "root"
+                             :password ""})
 
 (defn getModString [string]
   (str "%" string "%"))
@@ -36,10 +40,7 @@
 ; -------------------------------------------------------------------------------------
 ; DATABASE + ENTITES
 
-(defdb mySQLDatabase (mysql {:host "localhost"
-                              :db "clojureprojekt"
-                              :user "root"
-                              :password ""})) 
+(defdb mySQLDatabase (mysql databaseConfiguration)) 
 
 (defentity title
   (database mySQLDatabase) 
@@ -61,7 +62,7 @@
   
 ; -------------------------------------------------------------------------------------
 ; DATABASE SELECT
-; auch auf get nil überprüfen
+
 (defn selectTitle
   "Selects a number of titles from the database"    
   ([] (select title 
@@ -104,13 +105,16 @@
   "Inserts a title in the database"
   [newtitle] 
   (transaction
-    (insert title (values newtitle))))
+    (insert title (values {:name (newtitle :name)
+                           :isbn (newtitle :isbn)
+                           :author (newtitle :author)
+                           :publisher_id ((newtitle :publisher) :id)}))))
 
 (defn insertPublisher
   "Inserts a publisher in the database"
   [newPublisher] 
     (transaction
-      (insert publisher (values newPublisher))))
+      (insert publisher (values {:name (newPublisher :name)}))))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE UPDATE
@@ -146,7 +150,19 @@
 (defn deletePublisher
   "Deletes a publisher in the database"
   [publisherId] 
+  (log/info "test")
+  (log/info (checkPublisher publisherId))
   (transaction
-    (delete publisher (where {:id [= publisherId]}))))
+    (if (checkPublisher publisherId)
+      (delete publisher (where {:id [= publisherId]}))
+      (log/debug "publisher is still in use"))))
 
-
+(defn checkPublisher 
+  "Checks if publisher is still in use"
+  [publisherId]
+  (empty? (selectTitle {:name ""
+                            :isbn ""
+                            :author ""
+                            :publisher {:id publisherId
+                                        :name ""}})))
+  

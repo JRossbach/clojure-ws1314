@@ -31,11 +31,6 @@
         (var-set acc (conj @acc (types/publisher (value :id)
                                                  (value :name)))))@acc)))
 
-(defn executeSearchPublisherById 
-  "Calls the model method to find a publisher with the given id in the database"
-  [publisherId] 
-  (data/selectPublisher {:name "" :id publisherId}))
-
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
 

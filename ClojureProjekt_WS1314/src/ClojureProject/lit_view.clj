@@ -96,13 +96,16 @@
 (defn actualizePublisherComboBoxModel 
   "Actualizes the combobox entries with the existing publishers"
   []
-  (let [comboBoxModel (new javax.swing.DefaultComboBoxModel)
+  (let [comboBoxModelSearch (new javax.swing.DefaultComboBoxModel)
+        comboBoxModelSelect (new javax.swing.DefaultComboBoxModel)
         publisher (control/search (types/publisher defaultPublisherId ""))]
-    (.addElement comboBoxModel defaultComboBoxEntry)
-    (doseq [p publisher] (.addElement comboBoxModel p))
-    (config! field_searchTitle_publisher :model comboBoxModel)
-    (config! field_addTitle_publisher :model comboBoxModel)
-    (config! field_modifyTitle_publisher :model comboBoxModel)))
+    (.addElement comboBoxModelSearch defaultComboBoxEntry)
+    (doseq [p publisher] 
+      (.addElement comboBoxModelSearch p)
+      (.addElement comboBoxModelSelect p))    
+    (config! field_searchTitle_publisher :model comboBoxModelSearch)
+    (config! field_addTitle_publisher :model comboBoxModelSelect)
+    (config! field_modifyTitle_publisher :model comboBoxModelSelect)))
 
 (defn handleHideMessageBox 
   ""
@@ -162,7 +165,7 @@
                                                  (config field_searchTitle_name :text)
                                                  (config field_searchTitle_author :text)
                                                  (config field_searchTitle_isbn :text)
-                                                 (selection field_modifyTitle_publisher))))
+                                                 (selection field_searchTitle_publisher))))
     (catch Exception e (str "caught exception: " (.getMessage e)))))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
@@ -184,7 +187,7 @@
                               (config field_addTitle_name :text)
                               (config field_addTitle_author :text)
                               (config field_addTitle_isbn :text)
-                              ((selection field_modifyTitle_publisher) :id)))
+                              (selection field_modifyTitle_publisher)))
     (switch searchTitle_panel)
     (handleExecuteSearchTitle)
     (catch Exception e (str "caught exception: " (.getMessage e)))))
@@ -223,7 +226,12 @@
   "Deletes the selected title from the database"
   [] 
   (try 
-    (control/delete (value-at searchTitle_search_table (selection searchTitle_search_table)))
+    (let [title (value-at searchTitle_search_table (selection searchTitle_search_table))]
+      (control/delete (types/title (title :id)
+                                   (title :name)
+                                   (title :author)
+                                   (title :isbn)
+                                   (title :publisher))))
     (handleExecuteSearchTitle)
     (switch searchTitle_panel)
     (catch Exception e (str "caught exception: " (.getMessage e)))))
@@ -294,7 +302,9 @@
   "Deletes the selected publisher from the database"
   [] 
   (try 
-    (control/delete (value-at searchPublisher_search_table (selection searchPublisher_search_table)))
+    (let [publisher (value-at searchPublisher_search_table (selection searchPublisher_search_table))]
+      (control/delete (types/publisher (publisher :id)
+                                       (publisher :name))))    
     (actualizePublisherComboBoxModel)
     (handleExecuteSearchPublisher)
     (handleExecuteSearchTitle)
