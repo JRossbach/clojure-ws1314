@@ -141,10 +141,13 @@
   ([result] (config! searchPublisher_search_table :model [:columns searchPublisherTableModel 
                                                           :rows (getResultTableBody result)])))
 
-(defn getResultTableBody 
+(defn getTitleResultTableBody 
   ""
-  [result] (vec (for [record result] 
-                  (vec (vals record)))))
+  [result] {:id (result :id)
+            :name (result :name)
+            :author (result :author)
+            :isbn (result :isbn)
+            :publisher ((result :publisher) :name)})
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH TITLE

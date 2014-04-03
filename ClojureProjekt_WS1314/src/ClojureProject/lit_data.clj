@@ -2,6 +2,7 @@
 (ns ClojureProject.lit_data
   (:require [korma.core :refer :all]
             [korma.db :refer :all]
+            [clojure.java.io :refer :all]
             [clojure.string :as str] 
             [clojure.tools.logging :as log]))
 
@@ -29,10 +30,17 @@
 ; -------------------------------------------------------------------------------------
 ; UTIL
 
-(def databaseConfiguration {:host "localhost"
-                             :db "clojureprojekt"
-                             :user "root"
-                             :password ""})
+(defn load-props
+  [file-name]
+  (with-open [^java.io.Reader reader (clojure.java.io/reader file-name)]
+    (let[props (java.util.Properties.)]
+      (.load props reader)
+      (into {}(for [[k v] props]
+                [(keyword k)(read-string v)])))))
+
+;(def databaseConfiguration (load-props "./ressources/database.properties"))
+
+(def databaseConfiguration {:host "localhost" :db "clojureprojekt" :user "root" :password ""})
 
 (defn getModString [string]
   (str "%" string "%"))
