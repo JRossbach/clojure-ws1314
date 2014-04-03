@@ -31,6 +31,24 @@
         (var-set acc (conj @acc (types/publisher (value :id)
                                                  (value :name)))))@acc)))
 
+(defmulti searchById type)
+
+(defmethod searchById ::types/title [t] 
+  (log/debug "Search title with id[" + (t :id) + "]")
+  (let [result (get(data/selectTitleById (t :id)) 0)]
+    (types/title (result :id)
+                 (result :name)
+                 (result :author)
+                 (result :isbn)
+                 (types/publisher (result :id_2)
+                                  (result :name_2)))))
+
+(defmethod searchById ::types/publisher [p] 
+  (log/debug "Search publisher with id[" + (p :id) + "]")
+  (let [result (get (data/selectPublisherById (p :id)) 0)]
+    (types/title (result :id)
+                 (result :name))))
+
 ; -------------------------------------------------------------------------------------
 ; ADD ITEMS
 

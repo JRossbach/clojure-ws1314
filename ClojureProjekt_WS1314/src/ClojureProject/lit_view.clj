@@ -17,7 +17,8 @@
 (declare setTitleResultTableModel)
 (declare setPublisherResult)
 (declare setPublisherResultTableModel)
-(declare getResultTableBody)
+(declare getTitleResultTableBody)
+(declare getPublisherResultTableBody)
 
 (declare database_panel)
 (declare field_database_host)
@@ -65,23 +66,18 @@
 
 (native!) ; native os ui
 
-(def defaultDatabaseHost "localhost")
-(def defaultDatabaseName "clojureprojekt")
-(def defaultDatabaseUsername "root")
-(def defaultDatabasePassword "")
-
 (def defaultComboBoxEntry {:id -1 :name "-"})
 (def defaultTitleId -1)
 (def defaultPublisherId -1)
 
-(def searchTitleTableModel [{:key :id, :text "ID"}
-                            {:key :name, :text "Name"}
-                            {:key :author, :text "Autor"}
-                            {:key :isbn, :text "ISBN"}
-                            {:key :publisher, :text "Verlag"}])
+(def searchTitleTableModel [{:key :id, :text (label/i18n :text_table_head_id)}
+                            {:key :name, :text (label/i18n :text_table_head_name)}
+                            {:key :author, :text (label/i18n :text_table_head_author)}
+                            {:key :isbn, :text (label/i18n :text_table_head_isbn)}
+                            {:key :publisher, :text (label/i18n :text_table_head_publisher)}])
 
-(def searchPublisherTableModel [{:key :id, :text "ID"}
-                                {:key :name, :text "Name"}])
+(def searchPublisherTableModel [{:key :id, :text (label/i18n :text_table_head_id)}
+                                {:key :name, :text (label/i18n :text_table_head_name)}])
 
 (defn switch 
   "Switches the content of the main windows to the given container"
@@ -126,7 +122,19 @@
   ""
   ([] (clear! searchTitle_search_table))
   ([result] (config! searchTitle_search_table :model [:columns searchTitleTableModel 
-                                                      :rows (getResultTableBody result)])))
+                                                      :rows (getTitleResultTableBody result)])))
+
+(defn getTitleResultTableBody 
+  ""
+  [result]
+  (with-local-vars [acc, result]
+    (var-set acc [])
+    (doseq [value result]
+      (var-set acc (conj @acc {:id (value :id)
+                               :name (value :name)
+                               :author (value :author)
+                               :isbn (value :isbn)
+                               :publisher ((value :publisher) :name)})))@acc))
 
 (defn setPublisherResult
   "Fills the search publisher result table with the given result map"
@@ -139,15 +147,16 @@
   ""
   ([] (clear! searchPublisher_search_table))
   ([result] (config! searchPublisher_search_table :model [:columns searchPublisherTableModel 
-                                                          :rows (getResultTableBody result)])))
+                                                          :rows (getPublisherResultTableBody result)])))
 
-(defn getTitleResultTableBody 
+(defn getPublisherResultTableBody
   ""
-  [result] {:id (result :id)
-            :name (result :name)
-            :author (result :author)
-            :isbn (result :isbn)
-            :publisher ((result :publisher) :name)})
+  [result]  
+  (with-local-vars [acc, result]
+    (var-set acc [])
+    (doseq [value result]
+      (var-set acc (conj @acc {:id (value :id)
+                               :name (value :name)})))@acc))
 
 ;-------------------------------------------------------------------------------------------------------------------------------
 ; SEARCH TITLE
@@ -201,7 +210,8 @@
 (defn handleModifyTitle 
   "Opens the modify title panel with the data from the selected title"
   [] 
-  (let [title (value-at searchTitle_search_table (selection searchTitle_search_table))]
+  (let [selectedTitle (value-at searchTitle_search_table (selection searchTitle_search_table))
+        title (control/searchById (types/title (selectedTitle :id) "" "" "" (types/publisher defaultPublisherId "")))]
     (config! field_modifyTitle_id :text (title :id))
     (config! field_modifyTitle_name :text (title :name))
     (config! field_modifyTitle_isbn :text (title :isbn))
@@ -542,8 +552,8 @@
                        :width 800
                        :height 600
                        :menubar menu_frame_main
-                       :content searchTitle_panel))
-                       ;:on-close :exit))
+                       :content searchTitle_panel
+                       :on-close :exit))
 
 (log/info "start programm")
 (actualizePublisherComboBoxModel)

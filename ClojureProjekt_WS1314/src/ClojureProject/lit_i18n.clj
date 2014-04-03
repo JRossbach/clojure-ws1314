@@ -5,7 +5,13 @@
 ; NATIONALIZATION
 
 (def ^:private default
-  {:text_frame_messagebox_title "Fehler!"
+  {:text_table_head_id "ID"
+   :text_table_head_name "Name"
+   :text_table_head_author "Autor"
+   :text_table_head_isbn "ISBN"
+   :text_table_head_publisher "Verlag"   
+   
+   :text_frame_messagebox_title "Fehler!"
    :text_frame_messagebox_button "Ok"
    
    :text_frame_main_title "Literaturverzeichnis"   

@@ -40,7 +40,10 @@
 
 ;(def databaseConfiguration (load-props "./ressources/database.properties"))
 
-(def databaseConfiguration {:host "localhost" :db "clojureprojekt" :user "root" :password ""})
+(def databaseConfiguration {:host "localhost"
+                            :db "clojureprojekt"
+                            :user "root"
+                            :password ""})
 
 (defn getModString [string]
   (str "%" string "%"))
@@ -105,6 +108,19 @@
                 (where  (and {:id [= (get conditions :id)]}
                              {:name [like (getModString (get conditions :name))]})) 
                 (order :name :ASC)))))
+
+(defn selectTitleById
+  "Selects a titles from the database"   
+  [titleId]
+   (select title 
+           (with publisher)
+           (where {:id [= titleId]})))
+
+(defn selectPublisherById
+  "Selects a publisher from the database"   
+  [publisherId]
+   (select publisher 
+           (where {:id [= publisherId]})))
 
 ; -------------------------------------------------------------------------------------
 ; DATABASE INSERT
